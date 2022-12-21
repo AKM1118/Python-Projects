@@ -94,14 +94,14 @@ def mainGame():
     if AIenab == "Y":
         PieceSelect = input("Do you want to play as X or O? X/O ")
         if PieceSelect == "X":
-            playerX = PlayerClass(True,True,field)
-            playerO = PlayerClass(False,False,field)
+            playerX = PlayerClass(True, True, field)
+            playerO = PlayerClass(False, False, field)
         else:
-            playerX = PlayerClass(False,True,field)
-            playerO = PlayerClass(True,False,field)
+            playerX = PlayerClass(False, True, field)
+            playerO = PlayerClass(True, False, field)
     else:
-        playerX = PlayerClass(True,True,field)
-        playerO = PlayerClass(True,False,field)
+        playerX = PlayerClass(True, True, field)
+        playerO = PlayerClass(True, False, field)
 
     gameWorld.showField(field)
     while True:

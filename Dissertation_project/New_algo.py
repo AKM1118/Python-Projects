@@ -9,7 +9,7 @@ import cv2
 import glob
 import threading
 
-Template1 = cv2.imread(".\\Images\\template_2.jpg", 0)
+Template1 = cv2.imread(".\\Images\\template_1.jpg", 0)
 Template2 = cv2.imread(".\\Images\\template_2.jpg", 0)
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -109,50 +109,11 @@ gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
 edged = cv2.Canny(gray, 50, 100)
 #found = None
 # loop over the scales of the image
-#for scale in np.linspace(0.10, 1.0, 60)[::-1]:
-    # resize the image according to the scale, and keep track
-    # of the ratio of the resizing
-#    resized = imutils.resize(gray_temp, width=int(gray_temp.shape[1] * scale))
-#    r = resized.shape[1] / float(gray_temp.shape[1])
-    # if the resized image is smaller than the template, then break
-    # from the loop
-#    if resized.shape[0] < tH or resized.shape[1] < tW:
-#        break
-    # detect edges in the resized, grayscale image and apply template
-    # matching to find the template in the image
-#    edged_temp = cv2.Canny(resized, 50, 200)
-#    result = cv2.matchTemplate(edged, edged_temp, cv2.TM_CCOEFF_NORMED)
-#    (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
-    # check to see if the iteration should be visualized
-#    print("Max Corr val =", maxVal)
-#    if args.get("visualize", False):
-        # draw a bounding box around the detected region
-#        clone = np.dstack([edged, edged, edged])
-#        cv2.rectangle(clone, (maxLoc[0], maxLoc[1]),
-#                      (maxLoc[0] + resized.shape[0], maxLoc[1] + resized.shape[1]), (0, 0, 255), 5)
-#        clone_res = imutils.resize(clone, width=int(clone.shape[1] * 0.3))
-#        cv2.imshow("Visualize", clone_res)
-#        cv2.imshow("Current template", resized)
-#        cv2.waitKey(0)
-    # if we have found a new maximum correlation value, then update
-    # the bookkeeping variable
-#    if found is None or maxVal > found[0]:
-#        found = (maxVal, maxLoc, scale)
-# unpack the bookkeeping variable and compute the (x, y) coordinates
-# of the bounding box based on the resized ratio
-#print("found is =", found)
-#(_, maxLoc, r) = found
-#(startX, startY) = (int(maxLoc[0]), int(maxLoc[1]))
-#(endX, endY) = (int((template.shape[0])), int((template.shape[1])))
-# draw a bounding box around the detected result and display the image
-#print("endY =", endX, "endY =", endY, "startX =", startX, "startY =", startY)
-#cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 5)
-#cv2.line(image, (startX, 250), (int(endX * r), 1000), (160, 0, 105), 7)
-template = -2
+template = -1
 (template, top_left, scale, val) = GetSignSingle(image)
-if template != -2:
+if template != -1:
         bottom_right = (top_left[0] + int(64*scale), top_left[1] + int(64*scale))
-        cv2.rectangle(image,top_left, bottom_right, 255, 2)
+        cv2.rectangle(image,top_left, bottom_right, 255, 5)
         cv2.putText(image,str(val),(20,300),cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),2)
         cv2.putText(image,TemplateToString[template],(20,400),cv2.FONT_HERSHEY_SIMPLEX,2,(255,0,0),2)
 cv2.imwrite("Results/Image for template.jpg", image)

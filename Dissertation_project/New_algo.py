@@ -148,9 +148,9 @@ edged = cv2.Canny(gray, 50, 100)
 #print("endY =", endX, "endY =", endY, "startX =", startX, "startY =", startY)
 #cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 5)
 #cv2.line(image, (startX, 250), (int(endX * r), 1000), (160, 0, 105), 7)
-template = -1
+template = -2
 (template, top_left, scale, val) = GetSignSingle(image)
-if template != -1:
+if template != -2:
         bottom_right = (top_left[0] + int(64*scale), top_left[1] + int(64*scale))
         cv2.rectangle(image,top_left, bottom_right, 255, 2)
         cv2.putText(image,str(val),(20,300),cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),2)

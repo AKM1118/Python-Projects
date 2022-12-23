@@ -1,38 +1,47 @@
 import numpy as np
-from numpy import random
+
+
+# A function to draw a field with the desired size
+def showField(field):
+    for i in range(50):
+        print("")
+    print(" ---" * len(field), " ")
+    for y in field:
+        line = str("| ")
+        for x in y:
+            if x == 0:
+                line += " "
+            else:
+                if x == 1:
+                    line += "X"
+                else:
+                    line += "O"
+            line += " | "
+        print(line)
+        print(" ---" * len(field), " ")
+
 
 class GameCreate:
     def __init__(self, size):
         self.size = size
+
     def createField(self):
         field = np.zeros((self.size, self.size), dtype=int)
         return field
-    def showField(self,field):
-        for i in range(50):
-            print("")
-        print(" --- --- --- ")
-        for y in field:
-            line = str("| ")
-            for x in y:
-                if x == 0:
-                    line += " "
-                else:
-                    if x == 1:
-                        line += "O"
-                    else:
-                        line += "X"
-                line += " | "
-            print(line)
-            print(" --- --- --- ")
+
 
 class PlayerClass:
     # XorO = True for X
     # XorO = False for O
-    def __init__(self, player, XorO,gameWorld):
+    def __init__(self, player, XorO):
         self.player = player
         self.XorO = XorO
-        self.gameWorld = gameWorld
-    def makeMove(self, move, field):
+
+    def makeMove(self, field):
+        if self.player == False:
+            self.__moveAI(field)
+            return field
+        move = int(input("make your move from 1 to 9 = "))
         y = (move - 1) // 3
         x = (move - 1) % 3
         if field[y][x] == 0 and self.XorO:
@@ -40,81 +49,98 @@ class PlayerClass:
         elif field[y][x] == 0:
             field[y][x] = 2
         else:
-            self.gameWorld.showField(field)
+            showField(field)
             print("Wrong move, kiddo, space taken!")
-            self.makeMove(int(input("make your move from 1 to 9 =")), field)
+            self.makeMove(field)
         return field
-    def winCheck(self, field):
-        print("debug winCheck XorO ",self.XorO)
-        if self.XorO:
-            dot = 2
+
+    def __moveAI(self, field):
+        move = np.random.randint(1, 10, size=None, dtype=int)
+        y = (move - 1) // 3
+        x = (move - 1) % 3
+        if field[y][x] == 0 and self.XorO:
+            field[y][x] = 1
+        elif field[y][x] == 0:
+            field[y][x] = 2
         else:
+            self.__moveAI(field)
+        return field
+
+    def __minMaxAI(self, ):
+        print("kek")
+
+    def winCheck(self, field):
+        if self.XorO:
             dot = 1
-        print("debug dot ",dot)
+        else:
+            dot = 2
         # Horizontal check
         for y in field:
             win = 0
             for x in y:
                 if x == dot:
                     win += 1
-                if win == self.gameWorld.size:
+                if win == len(field):
                     return True
-        print("debug HC ",win)
         # Vertical check
         for x in range(len(field[0])):
             win = 0
             for y in range(len(field[0])):
                 if field[y][x] == dot:
                     win += 1
-                if win == self.gameWorld.size:
+                if win == len(field):
                     return True
-        print("debug VC ", win)
         # Diagonal check
         win = 0
         for x in range(len(field[0])):
             if field[x][x] == dot:
                 win += 1
-            if win == self.gameWorld.size:
+            if win == len(field):
                 return True
-        print("debug DC ", win)
         # Reverse Diagonal check
         win = 0
         for x in range(len(field[0])):
             if field[2 - x][x] == dot:
                 win += 1
-            if win == self.gameWorld.size:
+            if win == len(field):
                 return True
-        print("debug RDC ", win)
+
 
 def mainGame():
     size = int(input("Please select the size of your square: "))
     gameWorld = GameCreate(size)
     field = gameWorld.createField()
-    AIenab = input("Would you like to play against an AI? Y/N ")
-    if AIenab == "Y":
-        PieceSelect = input("Do you want to play as X or O? X/O ")
-        if PieceSelect == "X":
-            playerX = PlayerClass(True, True, field)
-            playerO = PlayerClass(False, False, field)
+    if input("Would you like to play against an AI? Y/N ") == "Y":
+        if input("Do you want to play as X or O? X/O ") == "X":
+            playerX = PlayerClass(True, True)
+            playerO = PlayerClass(False, False)
         else:
-            playerX = PlayerClass(False, True, field)
-            playerO = PlayerClass(True, False, field)
+            playerX = PlayerClass(False, True)
+            playerO = PlayerClass(True, False)
     else:
-        playerX = PlayerClass(True, True, field)
-        playerO = PlayerClass(True, False, field)
+        playerX = PlayerClass(True, True)
+        playerO = PlayerClass(True, False)
 
-    gameWorld.showField(field)
+    showField(field)
     while True:
-        field = playerX.makeMove(int(input("make your move from 1 to 9 = ")), field)
-        gameWorld.showField(field)
+        field = playerX.makeMove(field)
+        showField(field)
         if playerX.winCheck(field) == True:
-            print("suck a dick")
+            print("player X wins")
             break
-        field = playerO.makeMove(int(input("make your move from 1 to 9 = ")), field)
-        gameWorld.showField(field)
+        blank = 0
+        for y in field:
+            for x in y:
+                if x == 0:
+                    blank += 1
+        if blank == 0:
+            print("it's a draw")
+            break
+        field = playerO.makeMove(field)
+        showField(field)
         if playerO.winCheck(field) == True:
-            print("suck a pussy")
+            print("player O wins")
             break
+
 
 mainGame()
-

@@ -27,6 +27,9 @@ class GameCreate:
 
     def createField(self):
         field = np.zeros((self.size, self.size), dtype=int)
+        # for AI debug
+        field = np.array([[1,0,2],[1,0,1],[2,2,0]], dtype=int)
+        #
         return field
 
 
@@ -55,7 +58,10 @@ class PlayerClass:
         return field
 
     def __moveAI(self, field):
-        move = np.random.randint(1, 10, size=None, dtype=int)
+        if True:
+            _, move = self.__minMaxAI(field, self.XorO)
+        else:
+            move = np.random.randint(1, 10, size=None, dtype=int)
         y = (move - 1) // 3
         x = (move - 1) % 3
         if field[y][x] == 0 and self.XorO:
@@ -66,11 +72,33 @@ class PlayerClass:
             self.__moveAI(field)
         return field
 
-    def __minMaxAI(self, ):
+    def __minMaxAI(self, field, XorO):
+        # need to finish the minmax algo, probably make it separate from the movement
+        move = 0
+        score = 0
+        old_field = field.copy()
+        index_list = [1,2,3,4,5,6,7,8,9]
+        for pos in range(9):
+            y = (pos) // 3
+            x = (pos) % 3
+            if old_field[y][x] != 0:
+                index_list.remove(pos+1)
+
+        print(index_list)
+        for index in index_list:
+            if self.winCheck(self, old_field, XorO) == True:
+                score += 1
+            elif self.winCheck(self, old_field, not XorO) == True:
+                score -= 1
+            elif len(index_list) == 0:
+                score = 0
+            self.__minMaxAI(self, old_field, XorO)
+        return score, move
+
         print("kek")
 
-    def winCheck(self, field):
-        if self.XorO:
+    def winCheck(self, field, XorO):
+        if XorO:
             dot = 1
         else:
             dot = 2
@@ -125,7 +153,7 @@ def mainGame():
     while True:
         field = playerX.makeMove(field)
         showField(field)
-        if playerX.winCheck(field) == True:
+        if playerX.winCheck(field,playerX.XorO) == True:
             print("player X wins")
             break
         blank = 0
@@ -138,7 +166,7 @@ def mainGame():
             break
         field = playerO.makeMove(field)
         showField(field)
-        if playerO.winCheck(field) == True:
+        if playerO.winCheck(field,playerO.XorO) == True:
             print("player O wins")
             break
 

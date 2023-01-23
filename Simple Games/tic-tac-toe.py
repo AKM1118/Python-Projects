@@ -28,7 +28,7 @@ class GameCreate:
     def createField(self):
         field = np.zeros((self.size, self.size), dtype=int)
         # for AI debug
-        field = np.array([[1,0,2],[1,0,1],[2,2,0]], dtype=int)
+        #field = np.array([[1, 0, 2], [1, 0, 1], [2, 2, 0]], dtype=int)
         #
         return field
 
@@ -57,9 +57,10 @@ class PlayerClass:
             self.makeMove(field)
         return field
 
-    def __moveAI(self, field):
+    def __moveAI(self, field, moves_left=int):
+        # Get the moves_left from the main game to avoid recursion overflow
         if True:
-            _, move = self.__minMaxAI(field, self.XorO)
+            _, move = self.__minMaxAI(field, moves_left, self.XorO)
         else:
             move = np.random.randint(1, 10, size=None, dtype=int)
         y = (move - 1) // 3
@@ -72,30 +73,52 @@ class PlayerClass:
             self.__moveAI(field)
         return field
 
-    def __minMaxAI(self, field, XorO):
+    def __minMaxAI(self, field, depth=int, maxiPlayer=bool):
         # need to finish the minmax algo, probably make it separate from the movement
-        move = 0
-        score = 0
-        old_field = field.copy()
-        index_list = [1,2,3,4,5,6,7,8,9]
-        for pos in range(9):
-            y = (pos) // 3
-            x = (pos) % 3
-            if old_field[y][x] != 0:
-                index_list.remove(pos+1)
+        count = 1
+        free_index = []
+        for pos_y in field:
+            for pos_x in pos_y:
+                if pos_x == 0:
+                    free_index.append(count)
+                count += 1
+        if depth == 0 or self.winCheck(field, not maxiPlayer) is True:
+            maxi = not maxiPlayer
+            if self.winCheck(field, maxi) is True and maxi is True:
+                return 1, -1
+            elif self.winCheck(field, maxi) is True and maxi is False:
+                return -1, -1
+            else:
+                return 0, -1
 
-        print(index_list)
-        for index in index_list:
-            if self.winCheck(self, old_field, XorO) == True:
-                score += 1
-            elif self.winCheck(self, old_field, not XorO) == True:
-                score -= 1
-            elif len(index_list) == 0:
-                score = 0
-            self.__minMaxAI(self, old_field, XorO)
-        return score, move
-
-        print("kek")
+        if maxiPlayer:
+            maxVAL = 0
+            maxPos = -1
+            for pos in free_index:
+                field_copy = field.copy()
+                x = (pos - 1) % 3
+                y = (pos - 1) // 3
+                field_copy[y][x] = 2
+                cur_val, _ = self.__minmaxAI(field_copy, depth - 1, maxi=False)
+                if maxVAL < cur_val:
+                    maxPos = pos
+                    maxVAL = cur_val
+                print(f"maxVal for move {pos} is {maxVAL}")
+            return maxVAL, maxPos
+        else:
+            miniVAL = 0
+            minPos = -1
+            for pos in free_index:
+                field_copy = field.copy()
+                x = (pos - 1) % 3
+                y = (pos - 1) // 3
+                field_copy[y][x] = 1
+                cur_val, _ = self.__minmaxAI(field_copy, depth - 1, maxi=True)
+                if miniVAL > cur_val:
+                    minPos = pos
+                    miniVAL = cur_val
+                print(f"miniVal for move {pos} is {miniVAL}")
+            return miniVAL, minPos
 
     def winCheck(self, field, XorO):
         if XorO:
@@ -138,6 +161,7 @@ def mainGame():
     size = int(input("Please select the size of your square: "))
     gameWorld = GameCreate(size)
     field = gameWorld.createField()
+    # Make universal input so that Y and y is both accepted and other letters do not throw an exception
     if input("Would you like to play against an AI? Y/N ") == "Y":
         if input("Do you want to play as X or O? X/O ") == "X":
             playerX = PlayerClass(True, True)

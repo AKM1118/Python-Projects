@@ -83,7 +83,7 @@ for c in cnts:
 		refObj = (box, (cX, cY), D / args["width"])
 		continue
 
-
+	print("coef for distance is ", refObj[2])
 # draw the contours on the image
 	orig = image.copy()
 	cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)

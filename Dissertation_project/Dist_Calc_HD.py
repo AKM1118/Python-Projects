@@ -16,15 +16,22 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True,
 	help="path to the input image")
 ap.add_argument("-w", "--width", type=float, required=True,
-	help="width of the left-most object in the image (in inches)")
+	help="width of the left-most object in the image (in cm)")
 args = vars(ap.parse_args())
 
 
 # load the image, convert it to grayscale, and blur it slightly
 image = cv2.imread(args["image"])
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-gray = cv2.GaussianBlur(gray, (11, 11), 0)
 
+gamma = 5.0
+lookUpTable = np.empty((1, 256), np.uint8)
+for i in range(256):
+    lookUpTable[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
+new_image = cv2.LUT(image, lookUpTable)
+
+gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
+gray = cv2.GaussianBlur(gray, (11, 11), 0)
+edged = cv2.Canny(gray, 50, 100)
 
 # perform edge detection, then perform a dilation + erosion to
 # close gaps in between object edges
@@ -62,7 +69,7 @@ for c in cnts:
 	# box
 
 	box = perspective.order_points(box)
-	print(box)
+	#print(box)
 	# compute the center of the bounding box
 	cX = np.average(box[:, 0])
 	cY = np.average(box[:, 1])
@@ -109,7 +116,7 @@ for c in cnts:
 		cv2.putText(orig, "{:.4f}cm".format(D), (int(mX), int(mY - 10)),
 					cv2.FONT_HERSHEY_SIMPLEX, 7, color, 3)
 		# show the output image
-
+		print(f"comparing ref obj {refObj[0]} and {box}")
 		scale_percent = 15  # percent of original size
 		width = int(orig.shape[1] * scale_percent / 100)
 		height = int(orig.shape[0] * scale_percent / 100)
@@ -125,7 +132,5 @@ for c in cnts:
 
 		# resize image
 		resizedCanny = cv2.resize(edged, dim, interpolation=cv2.INTER_AREA)
-
 		cv2.imshow("Image", resized)
-		cv2.imshow("Binary Image",resizedCanny)
 		cv2.waitKey(0)

@@ -6,6 +6,8 @@ from imutils import perspective
 from imutils import contours
 from scipy.spatial import distance as dist
 
+import rawpy
+import imageio
 def approx_sorter(tup_list):
     for i in range(len(tup_list)):
         already_sorted = True
@@ -18,8 +20,8 @@ def approx_sorter(tup_list):
     for i in range(len(tup_list)):
         already_sorted = True
         for j in range(len(tup_list) - 1):
-            x1,y1 = tup_list[j]
-            x2,y2 = tup_list[j+1]
+            x1, y1 = tup_list[j]
+            x2, y2 = tup_list[j+1]
             if abs(x1-x2) < 3 and y1 > y2:
                 tup_list[j], tup_list[j + 1] = tup_list[j + 1], tup_list[j]
                 already_sorted = False
@@ -27,6 +29,10 @@ def approx_sorter(tup_list):
             break
     #check = tuple(abs(np.subtract(tup_list, key_item)))
     return tup_list
+def OpenDNG(path):
+    with rawpy.imread(path) as raw:
+        image = raw.postprocess()
+    return image
 destination = r'C:\Users\andre\Desktop\_учеба\Магистратура\диссер\Distance detection\Images'
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -38,14 +44,24 @@ ap.add_argument("-i", "--image", required=True,
 # Acquire template and image
 args = vars(ap.parse_args())
 template = cv2.imread(args["template"])
-image = cv2.imread(args["image"])
+#image = rawpy.imread(args["image"])
+image = OpenDNG(args["image"])
+scale_percent = 15  # percent of original size
+width = int(image.shape[1] * scale_percent / 100)
+height = int(image.shape[0] * scale_percent / 100)
+dim = (width, height)
+
+		# resize image
+image_s = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+cv2.imshow("opened image",image_s)
+cv2.waitKey(0)
 # Apply gamma correction
 gamma = 5.0
 lookUpTable = np.empty((1, 256), np.uint8)
 for i in range(256):
     lookUpTable[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
 new_image = cv2.LUT(image, lookUpTable)
-
+gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
 gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
 gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
 edged = cv2.Canny(gray, 50, 100)
@@ -88,9 +104,11 @@ corners = np.int0(corners)
 k = 0
 # visualise found contours
 for c in cnts:
+
     # if the contour is not sufficiently large, ignore it
     if cv2.contourArea(c) < 500:
         continue
+    print(f"area is {cv2.contourArea(c)}")
     dot_box_x = []
     dot_box_y = dot_box_x.copy()
     box = cv2.minAreaRect(c)
@@ -118,6 +136,7 @@ for c in cnts:
             dot_box_x.append((x, y))
             dot_box_y.append((y, x))
             cv2.circle(image, (x, y), 3, (255, 0, 0), -1)
+            print(f"point found at: {(x,y)}")
             #print(f"point found: {x,y}")
             i += 1
     dot_box_x = approx_sorter(dot_box_x)
@@ -164,7 +183,7 @@ for c in cnts:
         prop_list_x.append(D/D_x)
         cv2.putText(orig, "{:.4f}px".format(D), (int(dot_box_x[i][0]), int(dot_box_x[i][1] + 10)),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.65, (203, 192, 255), 2)
-        # show the output image
+#        # show the output image
         orig2 = image.copy()
         # draw circles corresponding to the current points and
         # connect them with a line

@@ -1,6 +1,7 @@
 import argparse
 import cv2
 import imutils
+import numpy
 import numpy as np
 from imutils import perspective
 from imutils import contours
@@ -29,6 +30,8 @@ def approx_sorter(tup_list):
             break
     #check = tuple(abs(np.subtract(tup_list, key_item)))
     return tup_list
+
+# Converter from RAW to png or jpeg?
 def OpenDNG(path):
     with rawpy.imread(path) as raw:
         image = raw.postprocess()
@@ -36,25 +39,17 @@ def OpenDNG(path):
 destination = r'C:\Users\andre\Desktop\_учеба\Магистратура\диссер\Distance detection\Images'
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-t", "--template", required=True,
-                help="path to the input image")
+#ap.add_argument("-t", "--template", required=True,
+#                help="path to the input image")
 ap.add_argument("-i", "--image", required=True,
                 help="path to the input image")
 
 # Acquire template and image
 args = vars(ap.parse_args())
-template = cv2.imread(args["template"])
-#image = rawpy.imread(args["image"])
-image = OpenDNG(args["image"])
-scale_percent = 15  # percent of original size
-width = int(image.shape[1] * scale_percent / 100)
-height = int(image.shape[0] * scale_percent / 100)
-dim = (width, height)
+#template = cv2.imread(args["template"])
+image = cv2.imread(args["image"])
+#image = OpenDNG(args["image"])
 
-		# resize image
-image_s = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
-cv2.imshow("opened image",image_s)
-cv2.waitKey(0)
 # Apply gamma correction
 gamma = 5.0
 lookUpTable = np.empty((1, 256), np.uint8)
@@ -62,8 +57,7 @@ for i in range(256):
     lookUpTable[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
 new_image = cv2.LUT(image, lookUpTable)
 gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
-gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
-gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+#gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
 edged = cv2.Canny(gray, 50, 100)
 
 # SIFT implementation
@@ -170,33 +164,58 @@ for c in cnts:
     D_y = dist.euclidean((int(dot_box_y[0][0]), int(dot_box_y[0][1])), (int(dot_box_y[1][0]), int(dot_box_y[1][1])))
     prop_list_x = []
     prop_list_y = prop_list_x.copy()
+    prop_list_deg_x = prop_list_x.copy()
+    prop_list_deg_y = prop_list_x.copy()
     while i < int(len(dot_box_x))-1:
         orig = image.copy()
         # draw circles corresponding to the current points and
         # connect them with a line
         cv2.line(orig, (int(dot_box_x[i][0]), int(dot_box_x[i][1])), (int(dot_box_x[i+1][0]), int(dot_box_x[i+1][1])),
                  (203, 192, 255), 2)
+        cv2.line(orig, (int(dot_box_x[i][0]), int(dot_box_x[i][1])),
+                 (int(dot_box_x[i][0]), int(dot_box_x[i + 1][1])),
+                 (0, 0, 255), 2)
         # compute the Euclidean distance between the coordinates,
         # and then convert the distance in pixels to distance in
         # units #mX mY
         D = dist.euclidean((dot_box_x[i][0], dot_box_x[i][1]), ((dot_box_x[i+1][0]), dot_box_x[i+1][1]))
+        D_arccos = dist.euclidean((dot_box_x[i][0], dot_box_x[i][1]), ((dot_box_x[i][0]), dot_box_x[i+1][1]))
+        if dot_box_x[i][0] - dot_box_x[i + 1][0] <= 0:
+            D_deg = -numpy.arccos(D_arccos / D)
+        else:
+            D_deg = numpy.arccos(D_arccos / D)
         prop_list_x.append(D/D_x)
+        prop_list_deg_x.append(D_deg)
         cv2.putText(orig, "{:.4f}px".format(D), (int(dot_box_x[i][0]), int(dot_box_x[i][1] + 10)),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.65, (203, 192, 255), 2)
-#        # show the output image
+        cv2.putText(orig, "{:.4f}deg".format(D_deg), (int(dot_box_x[i][0]), int(dot_box_x[i][1] + 30)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+        # show the output image
         orig2 = image.copy()
         # draw circles corresponding to the current points and
         # connect them with a line
         cv2.line(orig2, (int(dot_box_y[i][1]), int(dot_box_y[i][0])),
                  (int(dot_box_y[i + 1][1]), int(dot_box_y[i + 1][0])),
                  (203, 192, 255), 2)
+        cv2.line(orig2, (int(dot_box_y[i][1]), int(dot_box_y[i][0])),
+                 (int(dot_box_y[i + 1][1]), int(dot_box_y[i][0])),
+                 (0, 0, 255), 2)
         # compute the Euclidean distance between the coordinates,
         # and then convert the distance in pixels to distance in
         # units #mX mY
         D = dist.euclidean((dot_box_y[i][1], dot_box_y[i][0]), ((dot_box_y[i + 1][1]), dot_box_y[i + 1][0]))
+        D_arccos = dist.euclidean((dot_box_y[i][0], dot_box_y[i][1]), ((dot_box_y[i][0]), dot_box_y[i + 1][1]))
+        if dot_box_y[i][0] - dot_box_y[i + 1][0] >= 0:
+            D_deg = -numpy.arccos(D_arccos / D)
+        else:
+            D_deg = numpy.arccos(D_arccos / D)
         prop_list_y.append(D / D_y)
+        prop_list_deg_y.append(D_deg)
         cv2.putText(orig2, "{:.4f}px".format(D), (int(dot_box_y[i][1]) + 10, int(dot_box_y[i][0])),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.65, (203, 192, 255), 2)
+        cv2.putText(orig2, "{:.4f}deg".format(D_deg),
+                    (int(dot_box_y[i][1]), int(dot_box_y[i][0] + 30)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
         # show the output image
         i += 1
         orig = cv2.hconcat([orig, orig2])
@@ -204,9 +223,7 @@ for c in cnts:
         cv2.waitKey(0)
 # visualise corners as edge points
     writer = open(f"Results/prop list {k}.txt", "w")
-    writer.write(str(prop_list_x))
-    writer.write("\n\n")
-    writer.write(str(prop_list_y))
+    writer.write(f"{str(prop_list_x)}\n\n{str(prop_list_y)}\n\n{str(prop_list_deg_x)}\n\n{str(prop_list_deg_y)}")
     writer.close()
     k += 1
 #

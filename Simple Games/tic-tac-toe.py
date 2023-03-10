@@ -40,9 +40,9 @@ class PlayerClass:
         self.player = player
         self.XorO = XorO
 
-    def makeMove(self, field):
+    def makeMove(self, field, moves_left):
         if self.player == False:
-            self.__moveAI(field)
+            self.__moveAI__(field, moves_left=moves_left)
             return field
         move = int(input("make your move from 1 to 9 = "))
         y = (move - 1) // 3
@@ -57,11 +57,15 @@ class PlayerClass:
             self.makeMove(field)
         return field
 
-    def __moveAI(self, field, moves_left=int):
+    def __moveAI__(self, field, moves_left=int):
         # Get the moves_left from the main game to avoid recursion overflow
-        if True:
-            _, move = self.__minMaxAI(field, moves_left, self.XorO)
-        else:
+        score, move = self.__minMaxAI__(field, moves_left, self.XorO, alpha=-10, beta=10)
+        print(f"Current move is {move}, score {score}, {moves_left} moves left, {self.XorO}")
+        if move == -1:
+            XorO = not self.XorO
+            _, move = self.__minMaxAI__(field, moves_left, XorO, alpha=-10, beta=10)
+            print(f"Current move is {move}, {moves_left} moves left, {XorO}")
+        if move == -1:
             move = np.random.randint(1, 10, size=None, dtype=int)
         y = (move - 1) // 3
         x = (move - 1) % 3
@@ -70,18 +74,12 @@ class PlayerClass:
         elif field[y][x] == 0:
             field[y][x] = 2
         else:
-            self.__moveAI(field)
+            self.__moveAI__(field, moves_left)
         return field
 
-    def __minMaxAI(self, field, depth=int, maxiPlayer=bool):
-        # need to finish the minmax algo, probably make it separate from the movement
-        count = 1
-        free_index = []
-        for pos_y in field:
-            for pos_x in pos_y:
-                if pos_x == 0:
-                    free_index.append(count)
-                count += 1
+    def __minMaxAI__(self, field, depth=int, maxiPlayer=bool, alpha=int, beta=int):
+        # The algo works but during game testing it rarely calculate optimal moves
+        # Need to figure out the issue behind AI not using the algo since algo works fine
         if depth == 0 or self.winCheck(field, not maxiPlayer) is True:
             maxi = not maxiPlayer
             if self.winCheck(field, maxi) is True and maxi is True:
@@ -90,6 +88,13 @@ class PlayerClass:
                 return -1, -1
             else:
                 return 0, -1
+        count = 1
+        free_index = []
+        for pos_y in field:
+            for pos_x in pos_y:
+                if pos_x == 0:
+                    free_index.append(count)
+                count += 1
 
         if maxiPlayer:
             maxVAL = 0
@@ -99,11 +104,14 @@ class PlayerClass:
                 x = (pos - 1) % 3
                 y = (pos - 1) // 3
                 field_copy[y][x] = 2
-                cur_val, _ = self.__minmaxAI(field_copy, depth - 1, maxi=False)
+                cur_val, _ = self.__minMaxAI__(field_copy, depth - 1, False, alpha, beta)
+                alpha = max(alpha, cur_val)
+                if beta <= alpha:
+                    break
                 if maxVAL < cur_val:
                     maxPos = pos
                     maxVAL = cur_val
-                print(f"maxVal for move {pos} is {maxVAL}")
+                #print(f"maxVal for move {pos} is {maxVAL}")
             return maxVAL, maxPos
         else:
             miniVAL = 0
@@ -113,11 +121,14 @@ class PlayerClass:
                 x = (pos - 1) % 3
                 y = (pos - 1) // 3
                 field_copy[y][x] = 1
-                cur_val, _ = self.__minmaxAI(field_copy, depth - 1, maxi=True)
+                cur_val, _ = self.__minMaxAI__(field_copy, depth - 1, True, alpha, beta)
+                beta = min(beta, cur_val)
+                if beta <= alpha:
+                    break
                 if miniVAL > cur_val:
                     minPos = pos
                     miniVAL = cur_val
-                print(f"miniVal for move {pos} is {miniVAL}")
+                #print(f"miniVal for move {pos} is {miniVAL}")
             return miniVAL, minPos
 
     def winCheck(self, field, XorO):
@@ -174,25 +185,25 @@ def mainGame():
         playerO = PlayerClass(True, False)
 
     showField(field)
+    moves_left = 9
     while True:
-        field = playerX.makeMove(field)
+        field = playerX.makeMove(field, moves_left)
         showField(field)
         if playerX.winCheck(field,playerX.XorO) == True:
             print("player X wins")
             break
-        blank = 0
-        for y in field:
-            for x in y:
-                if x == 0:
-                    blank += 1
-        if blank == 0:
+        moves_left -= 1
+        if moves_left <= 0:
             print("it's a draw")
             break
-        field = playerO.makeMove(field)
+        field = playerO.makeMove(field, moves_left)
         showField(field)
         if playerO.winCheck(field,playerO.XorO) == True:
             print("player O wins")
             break
-
+        moves_left -= 1
+        if moves_left <= 0:
+            print("it's a draw")
+            break
 
 mainGame()

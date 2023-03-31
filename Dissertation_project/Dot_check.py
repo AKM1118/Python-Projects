@@ -11,6 +11,8 @@ import rawpy
 import imageio
 
 
+# Program for just finding the dots and contours on an image
+# Use it if you need to test how image quality affects contour and dot search
 def approx_sorter(tup_list):
     for i in range(len(tup_list)):
         already_sorted = True
@@ -59,7 +61,7 @@ lookUpTable = np.empty((1, 256), np.uint8)
 for i in range(256):
     lookUpTable[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
 new_image = cv2.LUT(image, lookUpTable)
-#gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+# gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
 gray = cv2.GaussianBlur(gray, (3, 3), 0)
 edged = cv2.Canny(gray, 50, 100)
@@ -81,7 +83,7 @@ for c in cnts:
     # if the contour is not sufficiently large, ignore it
     if cv2.contourArea(c) < 500:
         continue
-#    print(f"area is {cv2.contourArea(c)}")
+    #    print(f"area is {cv2.contourArea(c)}")
     dot_box_x = []
     box = cv2.minAreaRect(c)
     box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
@@ -91,9 +93,9 @@ for c in cnts:
     # Using a ratio to skip all non-mark contours
     ratio = ((box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2) / (
             (box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2)
-#    print("ratio is ", ratio)
-    #(0.15 <= ratio <= 0.35) or
-    if  (0.9 <= ratio <= 1.1):
+    #    print("ratio is ", ratio)
+    # (0.15 <= ratio <= 0.35) or
+    if 0.9 <= ratio <= 1.1:
         cv2.drawContours(image, [box.astype("int")], -1, (0, 255, 0), 3)
     else:
         continue
@@ -110,7 +112,7 @@ for c in cnts:
             dot_box_x.append((x, y))
             cv2.circle(image, (x, y), 3, (255, 0, 0), -1)
 #           print(f"point found at: {(x, y)}")
-            # print(f"point found: {x,y}")
+# print(f"point found: {x,y}")
 
 image = cv2.hconcat([image, new_image])
 cv2.imwrite("Results/result.jpg", image)

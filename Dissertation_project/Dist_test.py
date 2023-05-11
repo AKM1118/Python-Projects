@@ -7,8 +7,8 @@ from imutils import perspective
 from imutils import contours
 from scipy.spatial import distance as dist
 
-import rawpy
-import imageio
+#import rawpy
+#import imageio
 def midpoint(ptA, ptB):
     return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 # Does approximate sorting for dots in the contour
@@ -36,10 +36,10 @@ def approx_sorter(tup_list):
 
 
 # Converter from RAW to png or jpeg?
-def OpenDNG(path):
-    with rawpy.imread(path) as raw:
-        image = raw.postprocess()
-    return image
+#def OpenDNG(path):
+#    with rawpy.imread(path) as raw:
+#        image = raw.postprocess()
+#    return image
 
 
 destination = r'C:\Users\andre\Desktop\_учеба\Магистратура\диссер\Distance detection\Images'
@@ -47,25 +47,32 @@ destination = r'C:\Users\andre\Desktop\_учеба\Магистратура\ди
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True,
                 help="path to the input image")
+ap.add_argument("-c", "--contrast", required=True,
+                help="enter True if you need a gamma contrast correction")
+ap.add_argument("-d", "--distance", required=True,
+                help="enter True if you want to calculate distance between dots")
 # Acquire template and image
 args = vars(ap.parse_args())
 # template = cv2.imread(args["template"])
 image = cv2.imread(args["image"])
 # image = OpenDNG(args["image"])
 
-# Apply gamma correction
-gamma = 5.0
-
-# Use LookUpTable to swiftly convert image contrast by gamma value
-lookUpTable = np.empty((1, 256), np.uint8)
-for i in range(256):
-    lookUpTable[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
-new_image = cv2.LUT(image, lookUpTable)
-
-# Apply filtering to an image
-gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
-# gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
-edged = cv2.Canny(gray, 50, 100)
+if args["contrast"] == "True":
+    # Apply gamma correction
+    gamma = 5.0
+    # Use LookUpTable to swiftly convert image contrast by gamma value
+    lookUpTable = np.empty((1, 256), np.uint8)
+    for i in range(256):
+        lookUpTable[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
+    new_image = cv2.LUT(image, lookUpTable)
+    # Apply filtering to an image
+    gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
+    # gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    edged = cv2.Canny(gray, 50, 100)
+else:
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    edged = cv2.Canny(gray, 50, 100)
 
 # Get all possible contours from an image
 cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
@@ -101,8 +108,8 @@ for c in cnts:
     ratio = ((box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2) / (
             (box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2)
     #    print("ratio is ", ratio)
-    # (0.15 <= ratio <= 0.35) or
-    if 0.9 <= ratio <= 1.1:
+    #
+    if (0.15 <= ratio <= 0.35) or 0.9 <= ratio <= 1.1:
         cv2.drawContours(image, [box.astype("int")], -1, (0, 255, 0), 3)
     else:
         continue
@@ -200,42 +207,42 @@ for c in cnts_y:
                 break
     cntr_box_y.append(dot_box_y)
 print(cntr_box_x)
+if args["distance"] == "True":
+    dot_box_x_1 = cntr_box_x[0]
+    dot_box_x_2 = cntr_box_x[1]
+    D_x = dist.euclidean((int(dot_box_x_1[0][0]), int(dot_box_x_1[0][1])), (int(dot_box_x_2[0][0]), int(dot_box_x_2[0][1])))
+    D_x_cm = D_x / 81.5
 
-dot_box_x_1 = cntr_box_x[0]
-dot_box_x_2 = cntr_box_x[1]
-D_x = dist.euclidean((int(dot_box_x_1[0][0]), int(dot_box_x_1[0][1])), (int(dot_box_x_2[0][0]), int(dot_box_x_2[0][1])))
-D_x_cm = D_x / 81.5
+    dot_box_y_1 = cntr_box_y[0]
+    dot_box_y_2 = cntr_box_y[1]
+    D_y = dist.euclidean((int(dot_box_y_1[0][0]), int(dot_box_y_1[0][1])), (int(dot_box_y_2[0][0]), int(dot_box_y_2[0][1])))
+    D_y_cm = D_y / 298
+    for i in range(len(cntr_box_x) - 1):
 
-dot_box_y_1 = cntr_box_y[0]
-dot_box_y_2 = cntr_box_y[1]
-D_y = dist.euclidean((int(dot_box_y_1[0][0]), int(dot_box_y_1[0][1])), (int(dot_box_y_2[0][0]), int(dot_box_y_2[0][1])))
-D_y_cm = D_y / 298
-for i in range(len(cntr_box_x) - 1):
+        dot_box_x_1 = cntr_box_x[i]
+        dot_box_x_2 = cntr_box_x[i + 1]
 
-    dot_box_x_1 = cntr_box_x[i]
-    dot_box_x_2 = cntr_box_x[i + 1]
+        dot_box_y_1 = cntr_box_y[i]
+        dot_box_y_2 = cntr_box_y[i + 1]
 
-    dot_box_y_1 = cntr_box_y[i]
-    dot_box_y_2 = cntr_box_y[i + 1]
+        prop_list_x = []
+        prop_list_deg_x = prop_list_x.copy()
 
-    prop_list_x = []
-    prop_list_deg_x = prop_list_x.copy()
+        prop_list_y = []
+        prop_list_deg_y = prop_list_y.copy()
 
-    prop_list_y = []
-    prop_list_deg_y = prop_list_y.copy()
-
-    for j in range(int(len(dot_box_x_1))):
-        orig = image.copy()
-        # draw circles corresponding to the current points and
-        # connect them with a line
-        cv2.line(orig, (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1])),
+        for j in range(int(len(dot_box_x_1))):
+            orig = image.copy()
+            # draw circles corresponding to the current points and
+            # connect them with a line
+            cv2.line(orig, (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1])),
                  (int(dot_box_x_2[j][0]), int(dot_box_x_2[j][1])),
                  (203, 192, 255), 4)
         #cv2.line(orig, (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1])),
         #         (int(dot_box_x_2[j][0]), int(dot_box_x_2[j][1])),
         #         (0, 0, 255), 2)
 
-        cv2.line(orig, (int(dot_box_y_1[j][1]), int(dot_box_y_1[j][0])),
+            cv2.line(orig, (int(dot_box_y_1[j][1]), int(dot_box_y_1[j][0])),
                  (int(dot_box_y_2[j][1]), int(dot_box_y_2[j][0])),
                  (130, 130, 130), 4)
         #cv2.line(orig, (int(dot_box_y_1[j][1]), int(dot_box_y_1[j][0])),
@@ -245,58 +252,59 @@ for i in range(len(cntr_box_x) - 1):
         # compute the Euclidean distance between the coordinates,
         # and then convert the distance in pixels to distance in
         # units #mX mY
-        D = dist.euclidean((dot_box_x_1[j][0], dot_box_x_1[j][1]), ((dot_box_x_2[j][0]), dot_box_x_2[j][1])) / refObj[2]
-        D_arccos = dist.euclidean((dot_box_x_1[j][0], dot_box_x_1[j][1]), ((dot_box_x_1[j][0]), dot_box_x_2[j][1]))
-        if dot_box_x_1[j][0] - dot_box_x_2[j][0] <= 0:
-            D_deg = -numpy.arccos(D_arccos / D)
-        else:
-            D_deg = numpy.arccos(D_arccos / D)
-        prop_list_x.append(D)
-        prop_list_deg_x.append(D_deg)
+            D = dist.euclidean((dot_box_x_1[j][0], dot_box_x_1[j][1]), ((dot_box_x_2[j][0]), dot_box_x_2[j][1])) / refObj[2]
+            D_arccos = dist.euclidean((dot_box_x_1[j][0], dot_box_x_1[j][1]), ((dot_box_x_1[j][0]), dot_box_x_2[j][1]))
+            if dot_box_x_1[j][0] - dot_box_x_2[j][0] <= 0:
+                D_deg = -numpy.arccos(D_arccos / D)
+            else:
+                D_deg = numpy.arccos(D_arccos / D)
+            prop_list_x.append(D)
+            prop_list_deg_x.append(D_deg)
 
-        cv2.putText(orig, "{:.4f}cm".format(D), (int(dot_box_x_1[j][0]), int(dot_box_x_2[j][1] + 10)),
+            cv2.putText(orig, "{:.4f}cm".format(D), (int(dot_box_x_1[j][0]), int(dot_box_x_2[j][1] + 10)),
                     cv2.FONT_HERSHEY_SIMPLEX, 3, (203, 192, 255), 10)
         #cv2.putText(orig, "{:.4f}deg".format(D_deg), (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1] + 30)),
         #            cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 10)
 
-        D = dist.euclidean((dot_box_y_1[j][1], dot_box_y_1[j][0]), ((dot_box_y_2[j][1]), dot_box_y_2[j][0])) / refObj[2]
-        D_arccos = dist.euclidean((dot_box_y_1[j][0], dot_box_y_1[j][1]), ((dot_box_y_1[j][0]), dot_box_y_2[j][1]))
-        if dot_box_y_1[j][0] - dot_box_y_2[j][0] <= 0:
-            D_deg = -numpy.arccos(D_arccos / D)
-        else:
-            D_deg = numpy.arccos(D_arccos / D)
-        prop_list_y.append(D)
-        prop_list_deg_y.append(D_deg)
+            D = dist.euclidean((dot_box_y_1[j][1], dot_box_y_1[j][0]), ((dot_box_y_2[j][1]), dot_box_y_2[j][0])) / refObj[2]
+            D_arccos = dist.euclidean((dot_box_y_1[j][0], dot_box_y_1[j][1]), ((dot_box_y_1[j][0]), dot_box_y_2[j][1]))
+            if dot_box_y_1[j][0] - dot_box_y_2[j][0] <= 0:
+                D_deg = -numpy.arccos(D_arccos / D)
+            else:
+                D_deg = numpy.arccos(D_arccos / D)
+            prop_list_y.append(D)
+            prop_list_deg_y.append(D_deg)
 
-        cv2.putText(orig, "{:.4f}cm".format(D), (int(dot_box_y_2[j][1]), int(dot_box_y_1[j][0])),
+            cv2.putText(orig, "{:.4f}cm".format(D), (int(dot_box_y_2[j][1]), int(dot_box_y_1[j][0])),
                     cv2.FONT_HERSHEY_SIMPLEX, 3, (130, 130, 130), 10)
         # cv2.putText(orig, "{:.4f}deg".format(D_deg), (int(dot_box_y_1[j][1]), int(dot_box_y_1[j][0] + 30)),
         #            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 10)
         # show the output image
 
-        scale_percent = 25  # percent of original size
-        width = int(orig.shape[1] * scale_percent / 100)
-        height = int(orig.shape[0] * scale_percent / 100)
-        dim = (width, height)
+            scale_percent = 25  # percent of original size
+            width = int(orig.shape[1] * scale_percent / 100)
+            height = int(orig.shape[0] * scale_percent / 100)
+            dim = (width, height)
 
-        # resize image
-        resized = cv2.resize(orig, dim, interpolation=cv2.INTER_AREA)
+            # resize image
+            resized = cv2.resize(orig, dim, interpolation=cv2.INTER_AREA)
 
-        cv2.imshow("Image", resized)
-        cv2.waitKey(0)
+            cv2.imshow("Image", resized)
+            cv2.waitKey(0)
 
-    # visualise corners as edge points
-    writer = open(f"Results/prop list {k}.txt", "w")
-    writer.write(f"{str(prop_list_x)}\n\n{str(prop_list_y)}\n\n{str(prop_list_deg_x)}\n\n{str(prop_list_deg_y)}")
-    writer.close()
-    k += 1
+        # visualise corners as edge points
+        writer = open(f"Results/prop list {k}.txt", "w")
+        writer.write(f"{str(prop_list_x)}\n\n{str(prop_list_y)}\n\n{str(prop_list_deg_x)}\n\n{str(prop_list_deg_y)}")
+        writer.close()
+        k += 1
 #   part for distance calculation differences between
 
-
-image = cv2.hconcat([image, new_image])
+if args["contrast"] == "True":
+    image = cv2.hconcat([image, new_image])
 # resize = imutils.resize(image,width = int(image.shape[1] * 0.4),height = int(image.shape[1] * 0.4))
 # resize_match = imutils.resize(match_img,width = int(match_img.shape[1] * 0.3),height = int(match_img.shape[1] * 0.3))
 cv2.imwrite("Results/result.jpg", image)
+
 # cv2.imshow("keypoints",resize)
 # cv2.imshow("template",template)
 # cv2.imshow("matching",resize_match)

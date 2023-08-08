@@ -12,19 +12,19 @@ object_points[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
 points_on_object = []
 points_on_image = []
 # find all images used for calibration
-images = glob.glob('*.jpeg')
+images = glob.glob('*.jpg')
 # perform corner point extraction for every image found in the folder
 for fname in images:
     img = cv2.imread(fname)
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    ret, corners = cv2.findChessboardCornersSB(gray, (9, 6), None)
+    ret, corners = cv2.findChessboardCornersSB(gray, (6, 9), None)
     if ret:
         points_on_object.append(object_points)
         corners_sub_pixel = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
         points_on_image.append(corners_sub_pixel)
-        cv2.drawChessboardCorners(img, (9, 6), corners_sub_pixel, ret)
+        cv2.drawChessboardCorners(img, (6, 9), corners_sub_pixel, ret)
 
-    scale_percent = 40  # percent of original size
+    scale_percent = 60  # percent of original size
     width = int(img.shape[1] * scale_percent / 100)
     height = int(img.shape[0] * scale_percent / 100)
     dim = (width, height)
@@ -34,18 +34,34 @@ for fname in images:
 cv2.destroyAllWindows()
 # extracting calibration parameters from calibration images
 ret,mtx,dist,rvecs,tvecs = cv2.calibrateCamera(points_on_object,points_on_image, gray.shape[::-1], None, None)
-print(ret,mtx,dist,rvecs,tvecs)
+print(f"ret = {ret} # "
+      f"mtx = {mtx} # "
+      f"dist = {dist} # "
+      f"rvecs = {rvecs} # "
+      f"tvecs = {tvecs} # ")
 
 # using said parameters to undistort an unrelated image
-img = cv2.imread('20230806_174053.jpeg')
+img = cv2.imread('SDC12902.JPeG')
 h, w = img.shape[:2]
 newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
 
 dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
-
-# crop the image
-x, y, w, h = roi
-dst = dst[y:y+h, x:x+w]
-#image = cv2.hconcat([img, dst])
-cv2.imwrite('calibresult1.png', img)
 cv2.imwrite('calibresult2.png', dst)
+
+mapx, mapy = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (w,h), 5)
+dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+cv2.imwrite('calibresult3.png', dst)
+# crop the image
+# x, y, w, h = roi
+# dst = dst[y:y+h, x:x+w]
+# image = cv2.hconcat([img, dst])
+cv2.imwrite('calibresult1.png', img)
+
+
+mean_error = 0
+for i in range(len(points_on_object)):
+ imgpoints2, _ = cv2.projectPoints(points_on_object[i], rvecs[i], tvecs[i], mtx, dist)
+ error = cv2.norm(points_on_image[i], imgpoints2, cv2.NORM_L2)/len(imgpoints2)
+ mean_error += error
+print( "total error: {}".format(mean_error/len(points_on_object)) )
+print(type(ret),type(mtx),type(dist),type(rvecs),type(tvecs))

@@ -68,7 +68,10 @@ if args["contrast"] == "True":
     # Apply filtering to an image
     gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
     # gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    edged = cv2.GaussianBlur(gray, (11,11), 0)
     edged = cv2.Canny(gray, 50, 100)
+    #edged = cv2.dilate(edged, None, iterations=2)
+    #edged = cv2.erode(edged, None, iterations=2)
 else:
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
@@ -301,9 +304,11 @@ if args["distance"] == "True":
 
 if args["contrast"] == "True":
     image = cv2.hconcat([image, new_image])
+#    image = cv2.vconcat([image, edged])
 # resize = imutils.resize(image,width = int(image.shape[1] * 0.4),height = int(image.shape[1] * 0.4))
 # resize_match = imutils.resize(match_img,width = int(match_img.shape[1] * 0.3),height = int(match_img.shape[1] * 0.3))
 cv2.imwrite("Results/result.jpg", image)
+cv2.imwrite("Results/result2.jpg", edged)
 
 # cv2.imshow("keypoints",resize)
 # cv2.imshow("template",template)

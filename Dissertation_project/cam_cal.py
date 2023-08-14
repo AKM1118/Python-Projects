@@ -37,7 +37,7 @@ for fname in images:
         for i in range(len(corners_sub_pixel) / 6):
             x = (corners_sub_pixel[i, 0] - corners_sub_pixel[i, 0])
 
-    scale_percent = 60  # percent of original size
+    scale_percent = 55  # percent of original size
     width = int(img.shape[1] * scale_percent / 100)
     height = int(img.shape[0] * scale_percent / 100)
     dim = (width, height)

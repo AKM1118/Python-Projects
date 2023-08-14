@@ -17,12 +17,25 @@ images = glob.glob('*.jpg')
 for fname in images:
     img = cv2.imread(fname)
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    ret, corners = cv2.findChessboardCornersSB(gray, (6, 9), None)
+    ret, corners = cv2.findChessboardCorners(gray, (6, 9), None)
     if ret:
         points_on_object.append(object_points)
         corners_sub_pixel = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+        print(corners_sub_pixel)
         points_on_image.append(corners_sub_pixel)
-        cv2.drawChessboardCorners(img, (6, 9), corners_sub_pixel, ret)
+        cv2.drawChessboardCorners(img, (6, 9), corners, ret)
+        for i in range(len(corners_sub_pixel)):
+            coord = corners_sub_pixel[i]
+            x = coord[0,0]
+            y = coord[0,1]
+            cv2.circle(img, (int(x), int(y)), 8, (175+i,39+i, 45+i), -1)
+            cv2.putText(img, "{}".format(i),
+                        (int(x - 50), int(y - 20)), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.8, (175+i, 39+i, 45+i), 2)
+        for i in range(len(corners_sub_pixel)):
+            y = (corners_sub_pixel[i,0]-corners_sub_pixel[i,0])
+        for i in range(len(corners_sub_pixel) / 6):
+            x = (corners_sub_pixel[i, 0] - corners_sub_pixel[i, 0])
 
     scale_percent = 60  # percent of original size
     width = int(img.shape[1] * scale_percent / 100)
@@ -39,7 +52,7 @@ print(f"ret = {ret} # "
       f"dist = {dist} # "
       f"rvecs = {rvecs} # "
       f"tvecs = {tvecs} # ")
-
+#################################################################
 # using said parameters to undistort an unrelated image
 img = cv2.imread('SDC12902.JPeG')
 h, w = img.shape[:2]

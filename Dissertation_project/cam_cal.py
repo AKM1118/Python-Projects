@@ -21,7 +21,6 @@ for fname in images:
     if ret:
         points_on_object.append(object_points)
         corners_sub_pixel = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
-        print(corners_sub_pixel)
         points_on_image.append(corners_sub_pixel)
         cv2.drawChessboardCorners(img, (6, 9), corners, ret)
         for i in range(len(corners_sub_pixel)):
@@ -32,10 +31,10 @@ for fname in images:
             cv2.putText(img, "{}".format(i),
                         (int(x - 50), int(y - 20)), cv2.FONT_HERSHEY_SIMPLEX,
                         0.8, (175+i, 39+i, 45+i), 2)
-        for i in range(len(corners_sub_pixel)):
-            y = (corners_sub_pixel[i,0]-corners_sub_pixel[i,0])
-        for i in range(len(corners_sub_pixel) / 6):
-            x = (corners_sub_pixel[i, 0] - corners_sub_pixel[i, 0])
+        #for i in range(len(corners_sub_pixel)):
+        #    y = (corners_sub_pixel[i,0]-corners_sub_pixel[i,0])
+        #for i in range(len(corners_sub_pixel) / 6):
+        #    x = (corners_sub_pixel[i, 0] - corners_sub_pixel[i, 0])
 
     scale_percent = 55  # percent of original size
     width = int(img.shape[1] * scale_percent / 100)

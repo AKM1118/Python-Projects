@@ -55,6 +55,7 @@ print(f"ret = {ret} # "
 # using said parameters to undistort an unrelated image
 img = cv2.imread('SDC12902.JPeG')
 h, w = img.shape[:2]
+
 newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
 
 dst = cv2.undistort(img, mtx, dist, None, newcameramtx)

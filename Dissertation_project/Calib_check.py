@@ -3,17 +3,7 @@ import numpy as np
 import cv2
 from scipy.spatial import distance
 img = cv2.imread('SDC12887.JPG')
-gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-ret, corners = cv2.findChessboardCorners(gray, (6, 9), None)
-if ret:
- cv2.drawChessboardCorners(img, (6, 9), corners, ret)
- for i in range(len(corners)):
-  coord = corners[i]
-  x = coord[0,0]
-  y = coord[0,1]
-  cv2.circle(img, (int(x), int(y)), 8, (175+i,39+i, 45+i), -1)
-  cv2.putText(img, "{}".format(i),(int(x - 50), int(y - 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (39+i, 172+i, 45+i), 2)
-cv2.imwrite('calbka_1.png', img)
+
 r, c = 6, 9
 
 sub_corner_points = np.array([[1344.6705, 1444.8865], [1339.8512, 1372.2052], [1335.1322, 1298.0023], [1330.5327, 1223.1202],
@@ -110,6 +100,18 @@ newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
 undist = cv2.undistort(img, mtx, dist, None, newcameramtx)
 imgpoints2, _ = cv2.projectPoints(object_points, rvecs, tvecs, mtx, dist)
 
+gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+ret, corners = cv2.findChessboardCorners(gray, (6, 9), None)
+if ret:
+ cv2.drawChessboardCorners(img, (6, 9), corners, ret)
+ for i in range(len(corners)):
+  coord = corners[i]
+  x_old = coord[0,0]
+  y_old = coord[0,1]
+  cv2.circle(img, (int(x_old), int(y_old)), 8, (175+i,39+i, 45+i), -1)
+  cv2.putText(img, "{}".format(i),(int(x_old - 50), int(y_old - 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (39+i, 172+i, 45+i), 2)
+
+
 gray = cv2.cvtColor(undist,cv2.COLOR_BGR2GRAY)
 ret, corners = cv2.findChessboardCorners(gray, (6, 9), None)
 print("###### drawing points on a new image ######")
@@ -117,38 +119,38 @@ if ret:
  cv2.drawChessboardCorners(undist, (6, 9), corners, ret)
  for i in range(len(imgpoints2)):
   coord = imgpoints2[i]
-  x = coord[0,0]
-  y = coord[0,1]
+  x_new = coord[0,0]
+  y_new = coord[0,1]
   # cv2.circle(undist, (int(x), int(y)), 8, (175+i,39+i, 45+i), -1)
-  cv2.circle(undist, (int(x), int(y)), 8, (128 + i, 128 + i, 128 + i), -1)
-  cv2.putText(undist, "{}".format(i),(int(x - 50), int(y - 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (45+i, 39+i, 175+i), 2)
- for i in range(len(projected_corners)):
-  coord = projected_corners[i]
-  x = coord[0, 0]
-  y = coord[0, 1]
-  print(x, y)
-  cv2.circle(undist, (int(x), int(y)), 32, (255,255, 0), -1)
+  cv2.circle(undist, (int(x_new), int(y_new)), 8, (128 + i, 128 + i, 128 + i), -1)
+  cv2.circle(img, (int(x_new), int(y_new)), 8, (128 + i, 128 + i, 128 + i), -1)
+  cv2.putText(undist, "{}".format(i),(int(x_new - 50), int(y_new - 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (45+i, 39+i, 175+i), 2)
 print("############### writing cal2 image #############")
 cv2.imwrite('calbka_2.png', undist)
-
+cv2.imwrite('calbka_1.png', img)
 print("###### calculating x points for undist ######")
 for i in range(c):
- x_st, y_st = projected_corners[0+r*(i-1)]
- x_end, y_end = projected_corners[5+r*(i-1)]
+ coord = corners[0+r*(i-1)]
+ x_st, y_st = coord[0,0], coord[0,1]
+ coord = corners[5+r*(i-1)]
+ x_end, y_end = coord[0,0], coord[0,1]
  for j in range(r-1):
-  xi , yi = projected_corners[j+r*(i-1)]
+  coord = corners[j+r*(i-1)]
+  xi , yi = coord[0,0], coord[0,1]
   xi_calc = (yi-y_st)*(x_end-x_st)/(y_end-y_st)+x_st
   x_diff = xi - xi_calc
   x_list1[i-1][j-1] = x_diff
   print(f"row = {i}, column = {j}, xi = {xi}, x_calc = {xi_calc}")
-# yi = (xi-x_st)*(y_end-y_st)/(x_end-x_st)+y_st
 print(x_list1)
 print("###### calculating y points for undist ######")
 for i in range(r):
- x_st, y_st = projected_corners[i-1]
- x_end, y_end = projected_corners[48+i-1]
+ coord = corners[i-1]
+ x_st, y_st = coord[0,0], coord[0,1]
+ coord = corners[48+i-1]
+ x_end, y_end = coord[0,0], coord[0,1]
  for j in range(c-1):
-  xi , yi = projected_corners[6+r*(j-1)+(i-1)]
+  coord = corners[6+r*(j-1)+(i-1)]
+  xi , yi = coord[0,0], coord[0,1]
   yi_calc = (xi-x_st)*(y_end-y_st)/(x_end-x_st)+y_st
   y_diff = yi - yi_calc
   y_list1[i-1][j-1] = y_diff

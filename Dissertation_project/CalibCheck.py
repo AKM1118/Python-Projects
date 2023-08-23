@@ -4,85 +4,107 @@ import glob
 import numpy as np
 import cv2
 import xlwt
-from xlwt import Workbook
 
 
 def WriteToExcel(workbook, sheetName, x_list, y_list, x_list1, y_list1):
- sheet1 = workbook.add_sheet(sheetName)
- for i in range(len(x_list)):
-  for j in range(len(x_list[i])):
-   sheet1.write(i,j, x_list[i,j])
-   sheet1.write(i+20,j,x_list1[i,j])
- for i in range(len(y_list)):
-  for j in range(len(y_list[i])):
-   sheet1.write(i, j+20, y_list[i, j])
-   sheet1.write(i + 20, j+20, y_list1[i, j])
- workbook.save("deviation results.xls")
-def GetUndistorted(img,mtx,dist,Debug=False):
- w, h = img.shape[:2]
- newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
- undist = cv2.undistort(img, mtx, dist, None, newcameramtx)
- if Debug:
-  scale_percent = 55  # percent of original size
-  width = int(undist.shape[1] * scale_percent / 100)
-  height = int(undist.shape[0] * scale_percent / 100)
-  dim = (width, height)
-  resized = cv2.resize(undist, dim, interpolation=cv2.INTER_AREA)
-  cv2.imshow('img', resized)
-  cv2.waitKey(0)
- return undist
-def GetSubCornerPoints(img,rows,columns,Debug=False):
- criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
- gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
- ret, corners = cv2.findChessboardCorners(gray, (rows, columns), None)
- corners_sub_pixel = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
- if Debug:
-  print("#######sub_pix_corners#########")
-  print(corners_sub_pixel)
-  print("##########################")
- return corners_sub_pixel
-def GetDeviation(sub_corner_points,rows,columns,Debug=False): # Calculates deviation on x & y axies and return two arrays of deviations for each point
- r = rows
- c = columns
- x_list = np.zeros((c, r-2))
- y_list = np.zeros((r, c-2))
- for i in range(c):
-  coord = sub_corner_points[0 + r * (i - 1)]
-  x_st, y_st = coord [0,0],coord[0,1]
-  coord = sub_corner_points[5 + r * (i - 1)]
-  x_end, y_end = coord [0,0],coord[0,1]
-  for j in range(r - 1):
-   coord = sub_corner_points[j + r * (i - 1)]
-   xi, yi = coord [0,0],coord[0,1]
-   xi_calc = (yi - y_st) * (x_end - x_st) / (y_end - y_st) + x_st
-   x_diff = xi - xi_calc
-   x_list[i - 1][j - 1] = x_diff
+    sheet1 = workbook.add_sheet(sheetName)
+    for i in range(len(x_list)):
+        for j in range(len(x_list[i])):
+            sheet1.write(i, j, x_list[i, j])
+            sheet1.write(i + 20, j, x_list1[i, j])
+    for i in range(len(y_list)):
+        for j in range(len(y_list[i])):
+            sheet1.write(i, j + 20, y_list[i, j])
+            sheet1.write(i + 20, j + 20, y_list1[i, j])
+    workbook.save("deviation results.xls")
 
- for i in range(r):
-  coord = sub_corner_points[i - 1]
-  x_st, y_st = coord [0,0],coord[0,1]
-  coord = sub_corner_points[48 + i - 1]
-  x_end, y_end = coord [0,0],coord[0,1]
-  for j in range(c - 1):
-   coord = sub_corner_points[6 + r * (j - 1) + (i - 1)]
-   xi, yi = coord [0,0],coord[0,1]
-   yi_calc = (xi - x_st) * (y_end - y_st) / (x_end - x_st) + y_st
-   y_diff = yi - yi_calc
-   y_list[i - 1][j - 1] = y_diff
- if Debug:
-  print("##########x_list############")
-  print(x_list)
-  print("##########y_list############")
-  print(y_list)
-  print("############################")
- return x_list, y_list
-def CalculateImage(img,mtx,dist,rows,columns):
- sub_corner_points = GetSubCornerPoints(img,rows,columns)
- x_list, y_list = GetDeviation(sub_corner_points, r, c)
- undist_img = GetUndistorted(img,mtx,dist,True)
- sub_corner_points_un = GetSubCornerPoints(undist_img,rows,columns)
- x_list_un, y_list_un = GetDeviation(sub_corner_points_un,rows,columns)
- return x_list, y_list, x_list_un, y_list_un
+
+def GetUndistorted(img, mtx, dist, Debug=False):
+    w, h = img.shape[:2]
+    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+    undist = cv2.undistort(img, mtx, dist, None, newcameramtx)
+    if Debug:
+        scale_percent = 55  # percent of original size
+        width = int(undist.shape[1] * scale_percent / 100)
+        height = int(undist.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(undist, dim, interpolation=cv2.INTER_AREA)
+        cv2.imshow('img', resized)
+        cv2.waitKey(0)
+    return undist
+
+
+def GetSubCornerPoints(img, rows, columns, Debug=False):
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret, corners = cv2.findChessboardCorners(gray, (rows, columns), None)
+    corners_sub_pixel = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+    if Debug:
+        print("#######sub_pix_corners#########")
+        print(corners_sub_pixel)
+        print("##########################")
+    return corners_sub_pixel
+
+
+def GetDeviation(sub_corner_points, rows, columns,
+                 Debug=False):  # Calculates deviation on x & y axies and return two arrays of deviations for each point
+    r = rows
+    c = columns
+    x_list = np.zeros((c, r - 2))
+    y_list = np.zeros((r, c - 2))
+    for i in range(c):
+        coord = sub_corner_points[0 + r * (i - 1)]
+        x_st, y_st = coord[0, 0], coord[0, 1]
+        coord = sub_corner_points[5 + r * (i - 1)]
+        x_end, y_end = coord[0, 0], coord[0, 1]
+        for j in range(r - 1):
+            coord = sub_corner_points[j + r * (i - 1)]
+            xi, yi = coord[0, 0], coord[0, 1]
+            xi_calc = (yi - y_st) * (x_end - x_st) / (y_end - y_st) + x_st
+            x_diff = xi - xi_calc
+            x_list[i - 1][j - 1] = x_diff
+
+    for i in range(r):
+        coord = sub_corner_points[i - 1]
+        x_st, y_st = coord[0, 0], coord[0, 1]
+        coord = sub_corner_points[48 + i - 1]
+        x_end, y_end = coord[0, 0], coord[0, 1]
+        for j in range(c - 1):
+            coord = sub_corner_points[6 + r * (j - 1) + (i - 1)]
+            xi, yi = coord[0, 0], coord[0, 1]
+            yi_calc = (xi - x_st) * (y_end - y_st) / (x_end - x_st) + y_st
+            y_diff = yi - yi_calc
+            y_list[i - 1][j - 1] = y_diff
+    if Debug:
+        print("##########x_list############")
+        print(x_list)
+        print("##########y_list############")
+        print(y_list)
+        print("############################")
+    return x_list, y_list
+
+def ShowImage(img,undist_img,k):
+ undist = undist_img
+ scale_percent = 35  # percent of original size
+ width = int(undist.shape[1] * scale_percent / 100)
+ height = int(undist.shape[0] * scale_percent / 100)
+ dim = (width, height)
+ resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+ resized_undist = cv2.resize(undist, dim, interpolation=cv2.INTER_AREA)
+ image = cv2.hconcat([resized, resized_undist])
+ cv2.imshow(f'img{k}', image)
+ cv2.waitKey(0)
+def CalculateImage(img, k, mtx, dist, rows, columns, Debug=False):
+    sub_corner_points = GetSubCornerPoints(img, rows, columns)
+    x_list, y_list = GetDeviation(sub_corner_points, r, c)
+    undist_img = GetUndistorted(img, mtx, dist)
+    sub_corner_points_un = GetSubCornerPoints(undist_img, rows, columns)
+    if Debug:
+     ShowImage(img,undist_img,k)
+    x_list_un, y_list_un = GetDeviation(sub_corner_points_un, rows, columns)
+    return x_list, y_list, x_list_un, y_list_un
+
+
 images = glob.glob('*.jpg')
 
 # img = cv2.imread('SDC12887.JPG')
@@ -113,32 +135,31 @@ r, c = 6, 9
 ret = 0.7218316116723064
 
 mtx = np.array([[3.52538591e+03, 0.00000000e+00, 1.64924486e+03],
- [0.00000000e+00 ,3.55117301e+03, 1.16745770e+03],
- [0.00000000e+00 ,0.00000000e+00, 1.00000000e+00]])
+                [0.00000000e+00, 3.55117301e+03, 1.16745770e+03],
+                [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
 
-dist = np.array([-2.77084427e-01,  8.14581003e-01, -1.75902601e-03,  1.31484180e-03, -2.98025019e+00])
+dist = np.array([-2.77084427e-01, 8.14581003e-01, -1.75902601e-03, 1.31484180e-03, -2.98025019e+00])
 
+rvecs = np.array([0.01188501, -0.631624, 3.05759763])
 
-rvecs = np.array( [0.01188501,-0.631624  ,3.05759763])
+tvecs = np.array([[4.21520418, 3.28114488, 43.48286335]])
 
-tvecs = np.array([[ 4.21520418,3.28114488,43.48286335]])
-
-x_list = np.zeros((9,4))
-y_list = np.zeros((6,7))
-x_list1 = np.zeros((9,4))
-y_list1 = np.zeros((6,7))
+x_list = np.zeros((9, 4))
+y_list = np.zeros((6, 7))
+x_list1 = np.zeros((9, 4))
+y_list1 = np.zeros((6, 7))
 
 workbook = xlwt.Workbook()
 style = xlwt.easyxf('font: bold 1')
 k = 1
 print(f"total images = {len(images)}")
 for fname in images:
- img = cv2.imread(fname)
- x_list, y_list, x_list1, y_list1 = CalculateImage(img,mtx,dist,r,c)
- print(f"Writing image {k}")
- WriteToExcel(workbook,f"image {k}",x_list,y_list,x_list1,y_list1)
- print(f"Image {k} is done")
- k += 1
+    img = cv2.imread(fname)
+    x_list, y_list, x_list1, y_list1 = CalculateImage(img, k, mtx, dist, r, c, True)
+    print(f"Writing image {k}")
+    WriteToExcel(workbook, f"image {k}", x_list, y_list, x_list1, y_list1)
+    print(f"Image {k} is done")
+    k += 1
 
 """
 print("###### calculating x points for sub ######")

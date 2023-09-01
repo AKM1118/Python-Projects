@@ -49,9 +49,11 @@ if args["contrast"] == "True":
     edged = cv2.Canny(gray, 50, 100)
 else:
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(gray, (9, 9), 0)
     # gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     edged = cv2.Canny(gray, 50, 100)
-
+    edged = cv2.dilate(edged, None, iterations=1)
+    edged = cv2.erode(edged, None, iterations=1)
 # Get all possible contours from an image
 cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
                         cv2.CHAIN_APPROX_SIMPLE)
@@ -77,9 +79,8 @@ for c in cnts:
     ratio = ((box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2) / (
             (box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2)
     #    print("ratio is ", ratio)
-
-    # if (0.15 <= ratio <= 0.35) or 0.9 <= ratio <= 1.1:
-    if 0.9 <= ratio <= 1.1:
+    if (0.10 <= ratio <= 0.45) or 0.75 <= ratio <= 1.35:
+    #if 0.9 <= ratio <= 1.1:
         cv2.drawContours(image, [box.astype("int")], -1, (0, 255, 0), 3)
     else:
         continue
@@ -109,14 +110,14 @@ for c in cnts:
     cnts_mark.append(box)
 px = True
 orig = image.copy()
-h, w = orig.shape[:2]
-newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, distt, (w, h), 1, (w, h))
-dst = cv2.undistort(orig, mtx, distt, None, newcameramtx)
+#h, w = orig.shape[:2]
+#newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, distt, (w, h), 1, (w, h))
+#dst = cv2.undistort(orig, mtx, distt, None, newcameramtx)
 scale_percent = 60  # percent of original size
-width = int(dst.shape[1] * scale_percent / 100)
-height = int(dst.shape[0] * scale_percent / 100)
+width = int(orig.shape[1] * scale_percent / 100)
+height = int(orig.shape[0] * scale_percent / 100)
 dim = (width, height)
-resized = cv2.resize(dst, dim, interpolation=cv2.INTER_AREA)
+resized = cv2.resize(orig, dim, interpolation=cv2.INTER_AREA)
 cv2.imshow("Image", resized)
 cv2.waitKey(0)
 for c in cnts_mark:
@@ -138,9 +139,9 @@ for c in cnts_mark:
         ##cv2.circle(orig, (int(xB), int(yB)), 5, color, -1)
         # cv2.line(orig, (int(xA), int(yA)), (int(xB), int(yB)),
         #         color, 3)
-        cv2.circle(dst, (int(xA), int(yA)), 5, color, -1)
-        cv2.circle(dst, (int(xB), int(yB)), 5, color, -1)
-        cv2.line(dst, (int(xA), int(yA)), (int(xB), int(yB)),
+        cv2.circle(orig, (int(xA), int(yA)), 5, color, -1)
+        cv2.circle(orig, (int(xB), int(yB)), 5, color, -1)
+        cv2.line(orig, (int(xA), int(yA)), (int(xB), int(yB)),
                  color, 3)
         # compute the Euclidean distance between the coordinates,
         # and then convert the distance in pixels to distance in
@@ -149,7 +150,7 @@ for c in cnts_mark:
         (mX, mY) = midpoint((xA, yA), (xB, yB))
         # cv2.putText(orig, "{:.4f}cm".format(D), (int(mX), int(mY - 10)),
         #            cv2.FONT_HERSHEY_SIMPLEX, 7, color, 3)
-        cv2.putText(dst, "{:.4f}cm".format(D), (int(mX), int(mY - 10)),
+        cv2.putText(orig, "{:.4f}cm".format(D), (int(mX), int(mY - 10)),
                     cv2.FONT_HERSHEY_SIMPLEX, 7, color, 3)
         length_box.append(D)
 
@@ -159,10 +160,10 @@ for c in cnts_mark:
         # dim = (width, height)
         # resized = cv2.resize(orig, dim, interpolation=cv2.INTER_AREA)
         scale_percent = 60  # percent of original size
-        width = int(dst.shape[1] * scale_percent / 100)
-        height = int(dst.shape[0] * scale_percent / 100)
+        width = int(orig.shape[1] * scale_percent / 100)
+        height = int(orig.shape[0] * scale_percent / 100)
         dim = (width, height)
-        resized = cv2.resize(dst, dim, interpolation=cv2.INTER_AREA)
+        resized = cv2.resize(orig, dim, interpolation=cv2.INTER_AREA)
         cv2.imshow("Image", resized)
         cv2.waitKey(0)
         i += 1

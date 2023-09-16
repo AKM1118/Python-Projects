@@ -187,7 +187,7 @@ orig = image.copy()
 #h, w = orig.shape[:2]
 #newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, distt, (w, h), 1, (w, h))
 #dst = cv2.undistort(orig, mtx, distt, None, newcameramtx)
-showMyImage(image,30)
+showMyImage(image, 30)
 borders = False
 for c in cnts_mark:
     # continue

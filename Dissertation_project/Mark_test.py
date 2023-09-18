@@ -27,7 +27,7 @@ def approx_sorter(tup_list):
         for j in range(len(tup_list) - 1):
             x1, y1 = tup_list[j]
             x2, y2 = tup_list[j + 1]
-            if abs(x1 - x2) < 6 and y1 > y2:
+            if abs(x1 - x2) < 10 and y1 > y2:
                 tup_list[j], tup_list[j + 1] = tup_list[j + 1], tup_list[j]
                 already_sorted = False
         if already_sorted:
@@ -81,31 +81,31 @@ if args["contrast"] == "true":
     for i in range(256):
         lookUpTable[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
     new_image = cv2.LUT(image, lookUpTable)
-    showMyImage(image,30)
-    showMyImage(new_image,30)
+    #showMyImage(image,30)
+    #showMyImage(new_image,30)
     # Apply filtering to an image
     gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
 
     # gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     edged = cv2.Canny(gray, 50, 100)
-    showMyImage(edged, 30)
+    #showMyImage(edged, 30)
 else:
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    showMyImage(gray,30)
+    #showMyImage(gray,30)
     gray = cv2.GaussianBlur(gray, (9, 9), 0)
-    showMyImage(gray,30)
+    #showMyImage(gray,30)
     # gray_temp = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     edged = cv2.Canny(gray, 50, 100)
-    showMyImage(edged, 30)
+    #showMyImage(edged, 30)
     edged = cv2.dilate(edged, None, iterations=1)
-    showMyImage(edged, 30)
+    #showMyImage(edged, 30)
     edged = cv2.erode(edged, None, iterations=1)
-    showMyImage(edged, 30)
+    #showMyImage(edged, 30)
 # Get all possible contours from an image
 cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
                         cv2.CHAIN_APPROX_SIMPLE)
-showMyImage(image,10)
+#showMyImage(image,10)
 cnts = imutils.grab_contours(cnts)
 (cnts, _) = contours.sort_contours(cnts, method="top-to-bottom")
 refContour = None
@@ -116,16 +116,18 @@ cntr_box_x = []
 cntr_box_y = []
 corners = cv2.goodFeaturesToTrack(gray, 5000, 0.1, 6)
 corners = np.int0(corners)
-
+l = 0
 for c in cnts:
 
     # if the contour is not sufficiently large, ignore it
-    if cv2.contourArea(c) < 4000:
-        continue
+    #if cv2.contourArea(c) < 200:
+    #    continue
     box = cv2.minAreaRect(c)
     box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
     box = np.array(box, dtype="int")
     box = perspective.order_points(box)
+    if cv2.contourArea(box) < 2000:
+        continue
     cX = np.average(box[:, 0])
     cY = np.average(box[:, 1])
     dot_box_x = []
@@ -133,9 +135,9 @@ for c in cnts:
     # Using a ratio to skip all non-mark contours
     ratio = ((box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2) / (
             (box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2)
-    #print("ratio is ", ratio)
+    print("ratio is ", ratio)
     #if (0.10 <= ratio <= 0.45) or 0.75 <= ratio <= 1.35:
-    if 0.85 <= ratio <= 1.15:
+    if 0.65 <= ratio <= 1.65:
         cv2.drawContours(image, [box.astype("int")], -1, (0, 255, 0), 3)
     else:
         continue
@@ -146,7 +148,7 @@ for c in cnts:
             outside = 0
             x, y = point.ravel()
             # skip if the point is outside the selected contour
-            outside = cv2.pointPolygonTest(c, (int(x), int(y)), True)
+            outside = cv2.pointPolygonTest(box, (int(x), int(y)), True)
             if outside >= 10:
                 dot_box_x.append((x, y))
                 dot_box_y.append((y, x))
@@ -155,25 +157,30 @@ for c in cnts:
         dot_box_y = approx_sorter(dot_box_y)
         cntr_box_x.append(dot_box_x)
         cntr_box_y.append(dot_box_y)
+        print(f"box {l} us is {cv2.contourArea(box)}")
+        showMyImage(image,30)
+        l+=1
         continue
     elif px_to_cm is None:
-        D = dist.euclidean((refContour[0][0], refContour[0][1]), (box[0][0], box[0][1]))
+        D = dist.euclidean((refContour[1][0], refContour[1][1]), (box[0][0], box[0][1]))
         px_to_cm = D / args["width"]
         orig = image.copy()
-        cv2.circle(orig, (int(refContour[0][0]), int(refContour[0][1])), 5, (255, 0, 0), -1)
+        cv2.circle(orig, (int(refContour[1][0]), int(refContour[1][1])), 5, (255, 0, 0), -1)
         cv2.circle(orig, (int(box[0][0]), int(box[0][1])), 5, (255, 0, 0), -1)
-        cv2.line(orig, (int(refContour[0][0]), int(refContour[0][1])), (int(box[0][0]), int(box[0][1])),
+        cv2.line(orig, (int(refContour[1][0]), int(refContour[1][1])), (int(box[0][0]), int(box[0][1])),
                  (255, 0, 0), 5)
         (mX, mY) = midpoint((refContour[0][0], refContour[0][1]), (box[0][0], box[0][1]))
         cv2.putText(orig, "{:.4f}".format(D), (int(mX), int(mY - 10)),
                     cv2.FONT_HERSHEY_SIMPLEX, 6, (255, 0, 0), 5)
-        #print(px_to_cm)
+        print(f"pixel per metric is {px_to_cm}")
+        print(f"Pixel distance is {D}")
+        showMyImage(orig,30)
     cnts_mark.append(box)
     for point in corners:
         outside = 0
         x, y = point.ravel()
         # skip if the point is outside the selected contour
-        outside = cv2.pointPolygonTest(c, (int(x), int(y)), True)
+        outside = cv2.pointPolygonTest(box, (int(x), int(y)), True)
         if outside >= 10:
             dot_box_x.append((x, y))
             dot_box_y.append((y, x))
@@ -182,6 +189,9 @@ for c in cnts:
     dot_box_y = approx_sorter(dot_box_y)
     cntr_box_x.append(dot_box_x)
     cntr_box_y.append(dot_box_y)
+    l += 1
+    print(f"box {l} us is {cv2.contourArea(box)}")
+    showMyImage(image, 30)
 px = True
 orig = image.copy()
 #h, w = orig.shape[:2]
@@ -229,10 +239,25 @@ for cntr_num in range(len(cntr_box_x)):
     orig = image.copy()
     if len(cntr_box_x[cntr_num]) <= 15:
         continue
+
     prop_list_x = []
     prop_list_y = []
     dot_box_x_1 = cntr_box_x[cntr_num]
     dot_box_y_1 = cntr_box_y[cntr_num]
+    #dot_box_x_2 = cntr_box_x[cntr_num+1]
+    #dot_box_y_2 = cntr_box_y[cntr_num + 1]
+    orig = image.copy()
+    D_x1 = dist.euclidean((dot_box_x_1[0][0], dot_box_x_1[0][1]), (dot_box_x_1[12][0], dot_box_x_1[12][1]))
+    px_to_cm = D_x1/9
+    cv2.line(orig, (int(dot_box_x_1[0][0]), int(dot_box_x_1[0][1])),
+             (int(dot_box_x_1[12][0]), int(dot_box_x_1[12][1])),
+             (0, 123, 255), 4)
+    cv2.line(orig, (int(1657), int(5)),
+             (int(1657), int(2000)),
+             (0, 0, 255), 4)
+    (mX, mY) = midpoint((dot_box_x_1[0][0], dot_box_x_1[0][1]), (dot_box_x_1[12][0], dot_box_x_1[12][1]))
+    print(f"distance is {D_x1}, metric {px_to_cm}, x1 {dot_box_x_1[12][0]},x2 {dot_box_x_1[0][0]}, y1 {dot_box_x_1[12][1]},y2 { dot_box_x_1[0][1]}, mX,mY {(mX,mY)}")
+    showMyImage(orig,40)
     for i in range(len(cntr_box_x[cntr_num])-1):
         orig = image.copy()
         cv2.line(orig, (int(dot_box_x_1[i][0]), int(dot_box_x_1[i][1])),
@@ -252,6 +277,12 @@ for cntr_num in range(len(cntr_box_x)):
         # compute the Euclidean distance between the coordinates,
         # and then convert the distance in pixels to distance in
         # units #mX mY
+        #D = dist.euclidean((refContour[0][0], refContour[0][1]), (refContour[1][0], refContour[1][1]))
+        #px_to_cm = D / args["width"]
+        #px_to_cm = 28.224190657512306 # 9 cm 1 m
+        #px_to_cm = 13.610632423462906 # 123 cm 3 m
+        px_to_cm = 16.244001683180894 # 123 cm 2 m
+        #px_to_cm = 16.377149237961067  122 cm 2 m
         D_x = dist.euclidean((dot_box_x_1[i][0], dot_box_x_1[i][1]), ((dot_box_x_1[i+1][0]), dot_box_x_1[i+1][1])) / px_to_cm
         prop_list_x.append(D_x)
 

@@ -108,6 +108,7 @@ cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
 #showMyImage(image,10)
 cnts = imutils.grab_contours(cnts)
 (cnts, _) = contours.sort_contours(cnts, method="top-to-bottom")
+(cnts_x, _) = contours.sort_contours(cnts)
 refContour = None
 px_to_cm = None
 length_box = []
@@ -126,7 +127,7 @@ for c in cnts:
     box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
     box = np.array(box, dtype="int")
     box = perspective.order_points(box)
-    if cv2.contourArea(box) < 2000:
+    if cv2.contourArea(box) < 2500:
         continue
     cX = np.average(box[:, 0])
     cY = np.average(box[:, 1])
@@ -137,7 +138,7 @@ for c in cnts:
             (box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2)
     print("ratio is ", ratio)
     #if (0.10 <= ratio <= 0.45) or 0.75 <= ratio <= 1.35:
-    if 0.65 <= ratio <= 1.65:
+    if 0.75 <= ratio <= 1.35:
         cv2.drawContours(image, [box.astype("int")], -1, (0, 255, 0), 3)
     else:
         continue
@@ -157,7 +158,7 @@ for c in cnts:
         dot_box_y = approx_sorter(dot_box_y)
         cntr_box_x.append(dot_box_x)
         cntr_box_y.append(dot_box_y)
-        print(f"box {l} us is {cv2.contourArea(box)}")
+        print(f"box {l} is {cv2.contourArea(box)}")
         showMyImage(image,30)
         l+=1
         continue
@@ -174,7 +175,6 @@ for c in cnts:
                     cv2.FONT_HERSHEY_SIMPLEX, 6, (255, 0, 0), 5)
         print(f"pixel per metric is {px_to_cm}")
         print(f"Pixel distance is {D}")
-        showMyImage(orig,30)
     cnts_mark.append(box)
     for point in corners:
         outside = 0
@@ -192,12 +192,12 @@ for c in cnts:
     l += 1
     print(f"box {l} us is {cv2.contourArea(box)}")
     showMyImage(image, 30)
+showMyImage(image, 30)
 px = True
 orig = image.copy()
 #h, w = orig.shape[:2]
 #newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, distt, (w, h), 1, (w, h))
 #dst = cv2.undistort(orig, mtx, distt, None, newcameramtx)
-showMyImage(image, 30)
 borders = False
 for c in cnts_mark:
     # continue
@@ -233,8 +233,8 @@ for c in cnts_mark:
             cv2.putText(orig, "{:.6f}cm".format(D), (int(mX), int(mY - 10)),
                     cv2.FONT_HERSHEY_SIMPLEX, 4, color, 3)
             length_box.append(D)
-            showMyImage(orig,30)
             i += 1
+px_to_cm = 0
 for cntr_num in range(len(cntr_box_x)):
     orig = image.copy()
     if len(cntr_box_x[cntr_num]) <= 15:
@@ -244,32 +244,43 @@ for cntr_num in range(len(cntr_box_x)):
     prop_list_y = []
     dot_box_x_1 = cntr_box_x[cntr_num]
     dot_box_y_1 = cntr_box_y[cntr_num]
-    #dot_box_x_2 = cntr_box_x[cntr_num+1]
-    #dot_box_y_2 = cntr_box_y[cntr_num + 1]
+
     orig = image.copy()
-    D_x1 = dist.euclidean((dot_box_x_1[0][0], dot_box_x_1[0][1]), (dot_box_x_1[12][0], dot_box_x_1[12][1]))
-    px_to_cm = D_x1/9
-    cv2.line(orig, (int(dot_box_x_1[0][0]), int(dot_box_x_1[0][1])),
-             (int(dot_box_x_1[12][0]), int(dot_box_x_1[12][1])),
+    if px_to_cm == 0:
+        dot_box_x_1 = cntr_box_x[0]
+        dot_box_x_2 = cntr_box_x[1]
+        dot_box_y_2 = cntr_box_y[cntr_num + 1]
+        D_x1 = dist.euclidean((dot_box_x_1[15][0], dot_box_x_1[15][1]), (dot_box_x_2[3][0], dot_box_x_2[3][1]))
+        #D_x1 = dist.euclidean((dot_box_x_1[0][0], dot_box_x_1[0][1]), (dot_box_x_1[12][0], dot_box_x_1[12][1]))
+        px_to_cm = D_x1/args["width"]
+        cv2.line(orig, (int(dot_box_x_1[15][0]), int(dot_box_x_1[15][1])),
+             (int(dot_box_x_2[3][0]), int(dot_box_x_2[3][1])),
              (0, 123, 255), 4)
-    cv2.line(orig, (int(1657), int(5)),
-             (int(1657), int(2000)),
-             (0, 0, 255), 4)
-    (mX, mY) = midpoint((dot_box_x_1[0][0], dot_box_x_1[0][1]), (dot_box_x_1[12][0], dot_box_x_1[12][1]))
-    print(f"distance is {D_x1}, metric {px_to_cm}, x1 {dot_box_x_1[12][0]},x2 {dot_box_x_1[0][0]}, y1 {dot_box_x_1[12][1]},y2 { dot_box_x_1[0][1]}, mX,mY {(mX,mY)}")
-    showMyImage(orig,40)
+        #cv2.line(orig, (int(dot_box_x_1[0][0]), int(dot_box_x_1[0][1])),
+        #         (int(dot_box_x_1[12][0]), int(dot_box_x_1[12][1])),
+        #         (0, 123, 255), 4)
+        #cv2.line(orig, (int(1657), int(5)),
+        #     (int(1657), int(2000)),
+        #     (0, 0, 255), 4)
+
+        (mX, mY) = midpoint((dot_box_x_1[3][0], dot_box_x_1[3][1]), (dot_box_x_2[15][0], dot_box_x_2[15][1]))
+        #(mX, mY) = midpoint((dot_box_x_1[12][0], dot_box_x_1[12][1]), (dot_box_x_1[0][0], dot_box_x_1[0][1]))
+        cv2.putText(orig, "{:.4f}px".format(D_x1), (int(mX), int(mY)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 3, (203, 192, 255), 10)
+        print(f"distance is {D_x1}, metric {px_to_cm}, x1 {dot_box_x_2[3][0]},x2 {dot_box_x_1[15][0]}, y1 {dot_box_x_2[3][1]},y2 { dot_box_x_1[15][1]}, mX,mY {(mX,mY)}")
+        showMyImage(orig,40)
     for i in range(len(cntr_box_x[cntr_num])-1):
         orig = image.copy()
         cv2.line(orig, (int(dot_box_x_1[i][0]), int(dot_box_x_1[i][1])),
                  (int(dot_box_x_1[i+1][0]), int(dot_box_x_1[i+1][1])),
-                 (203, 192, 255), 4)
+                 (0, 0, 255), 5)
         # cv2.line(orig, (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1])),
         #         (int(dot_box_x_2[j][0]), int(dot_box_x_2[j][1])),
         #         (0, 0, 255), 2)
 
         cv2.line(orig, (int(dot_box_y_1[i][1]), int(dot_box_y_1[i][0])),
                  (int(dot_box_y_1[i+1][1]), int(dot_box_y_1[i+1][0])),
-                 (130, 130, 130), 4)
+                 (0, 255,0), 5)
         # cv2.line(orig, (int(dot_box_y_1[j][1]), int(dot_box_y_1[j][0])),
         #         (int(dot_box_y_2[j][1]), int(dot_box_y_2[j][0])),
         #         (255, 0, 0), 2)
@@ -281,21 +292,23 @@ for cntr_num in range(len(cntr_box_x)):
         #px_to_cm = D / args["width"]
         #px_to_cm = 28.224190657512306 # 9 cm 1 m
         #px_to_cm = 13.610632423462906 # 123 cm 3 m
-        px_to_cm = 16.244001683180894 # 123 cm 2 m
+        #px_to_cm = 16.244001683180894 # 123 cm 2 m
         #px_to_cm = 16.377149237961067  122 cm 2 m
+        #px_to_cm = 1.651137925480923 # 1244 mm 2 m
+        #px_to_cm = 1.1809669353409809 # 1244 mm 3 m
         D_x = dist.euclidean((dot_box_x_1[i][0], dot_box_x_1[i][1]), ((dot_box_x_1[i+1][0]), dot_box_x_1[i+1][1])) / px_to_cm
         prop_list_x.append(D_x)
 
-        cv2.putText(orig, "{:.4f}cm".format(D_x), (int(dot_box_x_1[i][0]), int(dot_box_x_1[i+1][1] + 10)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 3, (203, 192, 255), 10)
-        # cv2.putText(orig, "{:.4f}deg".format(D_deg), (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1] + 30)),
+        cv2.putText(orig, "{:.2f}mm".format(D_x), (int(dot_box_x_1[i][0]-300), int(dot_box_x_1[i+1][1] + 10)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 7)
+        #cv2.putText(orig, "{:.4f}deg".format(D_deg), (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1] + 30)),
         #            cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 10)
 
         D_y = dist.euclidean((dot_box_y_1[i][1], dot_box_y_1[i][0]), ((dot_box_y_1[i+1][1]), dot_box_y_1[i+1][0])) / px_to_cm
         prop_list_y.append(D_y)
 
-        cv2.putText(orig, "{:.4f}cm".format(D_y), (int(dot_box_y_1[i][1]), int(dot_box_y_1[i][0])),
-                    cv2.FONT_HERSHEY_SIMPLEX, 3, (130, 130, 130), 10)
+        cv2.putText(orig, "{:.2f}mm".format(D_y), (int(dot_box_y_1[i][1]), int(dot_box_y_1[i][0])-25),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 7)
         print(f"D_x is {D_x}, D_y is {D_y}")
         showMyImage(orig,30)
     WriteToExcel(workbook,f"mark {cntr_num}",prop_list_x,prop_list_y)

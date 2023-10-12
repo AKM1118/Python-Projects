@@ -250,24 +250,24 @@ for cntr_num in range(len(cntr_box_x)):
         dot_box_x_1 = cntr_box_x[0]
         dot_box_x_2 = cntr_box_x[1]
         dot_box_y_2 = cntr_box_y[cntr_num + 1]
-        D_x1 = dist.euclidean((dot_box_x_1[15][0], dot_box_x_1[15][1]), (dot_box_x_2[3][0], dot_box_x_2[3][1]))
+        D_x1 = dist.euclidean((dot_box_x_1[0][0], dot_box_x_1[0][1]), (dot_box_x_2[12][0], dot_box_x_2[12][1]))
         #D_x1 = dist.euclidean((dot_box_x_1[0][0], dot_box_x_1[0][1]), (dot_box_x_1[12][0], dot_box_x_1[12][1]))
         px_to_cm = D_x1/args["width"]
-        cv2.line(orig, (int(dot_box_x_1[15][0]), int(dot_box_x_1[15][1])),
-             (int(dot_box_x_2[3][0]), int(dot_box_x_2[3][1])),
+        cv2.line(orig, (int(dot_box_x_1[0][0]), int(dot_box_x_1[0][1])),
+             (int(dot_box_x_2[12][0]), int(dot_box_x_2[12][1])),
              (0, 123, 255), 4)
         #cv2.line(orig, (int(dot_box_x_1[0][0]), int(dot_box_x_1[0][1])),
         #         (int(dot_box_x_1[12][0]), int(dot_box_x_1[12][1])),
         #         (0, 123, 255), 4)
-        #cv2.line(orig, (int(1657), int(5)),
-        #     (int(1657), int(2000)),
-        #     (0, 0, 255), 4)
+        cv2.line(orig, (int(1676), int(5)),
+             (int(1676), int(2000)),
+             (0, 0, 255), 4)
 
-        (mX, mY) = midpoint((dot_box_x_1[3][0], dot_box_x_1[3][1]), (dot_box_x_2[15][0], dot_box_x_2[15][1]))
+        (mX, mY) = midpoint((dot_box_x_1[0][0], dot_box_x_1[0][1]), (dot_box_x_2[12][0], dot_box_x_2[12][1]))
         #(mX, mY) = midpoint((dot_box_x_1[12][0], dot_box_x_1[12][1]), (dot_box_x_1[0][0], dot_box_x_1[0][1]))
         cv2.putText(orig, "{:.4f}px".format(D_x1), (int(mX), int(mY)),
                     cv2.FONT_HERSHEY_SIMPLEX, 3, (203, 192, 255), 10)
-        print(f"distance is {D_x1}, metric {px_to_cm}, x1 {dot_box_x_2[3][0]},x2 {dot_box_x_1[15][0]}, y1 {dot_box_x_2[3][1]},y2 { dot_box_x_1[15][1]}, mX,mY {(mX,mY)}")
+        print(f"distance is {D_x1}, metric {px_to_cm}, x1 {dot_box_x_2[12][0]},x2 {dot_box_x_1[0][0]}, y1 {dot_box_x_2[0][1]},y2 { dot_box_x_1[0][1]}, mX,mY {(mX,mY)}")
         showMyImage(orig,40)
     for i in range(len(cntr_box_x[cntr_num])-1):
         orig = image.copy()
@@ -294,7 +294,7 @@ for cntr_num in range(len(cntr_box_x)):
         #px_to_cm = 13.610632423462906 # 123 cm 3 m
         #px_to_cm = 16.244001683180894 # 123 cm 2 m
         #px_to_cm = 16.377149237961067  122 cm 2 m
-        #px_to_cm = 1.651137925480923 # 1244 mm 2 m
+        px_to_cm = 1.651137925480923 # 1244 mm 2 m
         #px_to_cm = 1.1809669353409809 # 1244 mm 3 m
         D_x = dist.euclidean((dot_box_x_1[i][0], dot_box_x_1[i][1]), ((dot_box_x_1[i+1][0]), dot_box_x_1[i+1][1])) / px_to_cm
         prop_list_x.append(D_x)

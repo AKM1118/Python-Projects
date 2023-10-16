@@ -14,11 +14,11 @@ def draw(img, corners, imgpts, xAng, yAng, zAng):
  img = cv2.line(img, (int(corner[0]),int(corner[1])), (int(imgy[0]),int(imgy[1])), (0,255,0), 5)
  img = cv2.line(img, (int(corner[0]),int(corner[1])), (int(imgz[0]),int(imgz[1])), (0,0,255), 5)
  cv2.putText(img, "xAng {:.4f}".format(xAng), ((int(imgx[0]),int(imgx[1]-10))),
-             cv2.FONT_HERSHEY_SIMPLEX, 6, (255, 0, 0), 5)
+             cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 0, 0), 3)
  cv2.putText(img, "yAng {:.4f}".format(yAng), ((int(imgy[0]),int(imgy[1]-10))),
-             cv2.FONT_HERSHEY_SIMPLEX, 6, (0, 255, 0), 5)
- cv2.putText(img, "zAng {:.4f}".format(zAng), ((int(imgz[0]),int(imgz[1]-10))),
-             cv2.FONT_HERSHEY_SIMPLEX, 6, (0, 0, 255), 5)
+             cv2.FONT_HERSHEY_SIMPLEX, 4, (0, 255, 0), 3)
+ #cv2.putText(img, "zAng {:.4f}".format(zAng), ((int(imgz[0]),int(imgz[1]-10))),
+ #            cv2.FONT_HERSHEY_SIMPLEX, 4, (0, 0, 255), 3)
  return img
 
 def resizeImage(img, scale):
@@ -54,14 +54,17 @@ for fname in images:
         corners_sub_pixel = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
         points_on_image.append(corners_sub_pixel)
         cv2.drawChessboardCorners(img, (6, 9), corners, ret)
+        #showMyImage(img, 45)
         for i in range(len(corners_sub_pixel)):
             coord = corners_sub_pixel[i]
             x = coord[0,0]
             y = coord[0,1]
-            #cv2.circle(img, (int(x), int(y)), 8, (175+i,39+i, 45+i), -1)
-            #cv2.putText(img, "{}".format(i),
-            #            (int(x - 50), int(y - 20)), cv2.FONT_HERSHEY_SIMPLEX,
-            #            0.8, (175+i, 39+i, 45+i), 2)
+            orig = img.copy()
+            cv2.circle(orig, (int(x), int(y)), 8, (175+i,39+i, 45+i), -1)
+            cv2.putText(orig, "{}".format(i),
+                        (int(x - 50), int(y - 20)), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.8, (175+i, 39+i, 45+i), 2)
+            #showMyImage(orig, 45)
         #for i in range(len(corners_sub_pixel)):
         #    y = (corners_sub_pixel[i,0]-corners_sub_pixel[i,0])
         #for i in range(len(corners_sub_pixel) / 6):
@@ -84,24 +87,37 @@ print(f"ret = {ret} # "
       f"tvecs = {tvecs} # ")
 #################################################################
 # using said parameters to undistort an unrelated image
-img = cv2.imread('SDC12902.JPeG')
-h, w = img.shape[:2]
-newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
-dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
-cv2.imwrite('calibresult2.png', dst)
-mapx, mapy = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (w,h), 5)
-dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
-cv2.imwrite('calibresult3.png', dst)
+#img = cv2.imread('SDC12902.JPeG')
+#h, w = img.shape[:2]
+#newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
+#dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
+#cv2.imwrite('calibresult2.png', dst)
+#mapx, mapy = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (w,h), 5)
+#dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+#cv2.imwrite('calibresult3.png', dst)
 # crop the image
 # x, y, w, h = roi
 # dst = dst[y:y+h, x:x+w]
 # image = cv2.hconcat([img, dst])
-cv2.imwrite('calibresult1.png', img)
+#cv2.imwrite('calibresult1.png', img)
 mean_error = 0
 for i in range(len(points_on_object)):
  imgpoints2, _ = cv2.projectPoints(points_on_object[i], rvecs[i], tvecs[i], mtx, dist)
  error = cv2.norm(points_on_image[i], imgpoints2, cv2.NORM_L2)/len(imgpoints2)
  mean_error += error
+img = cv2.imread('SDC12890.JPG')
+orig = img.copy()
+imgpoints2, _ = cv2.projectPoints(points_on_object[3], rvecs[3], tvecs[3], mtx, dist)
+for j in range(len(points_on_object[3])):
+    coord = imgpoints2[j][0]
+    print(coord)
+    x = coord[0]
+    y = coord[1]
+    cv2.circle(orig, (int(x), int(y)), 8, (45 + j, 39 + j, 165 + j), -1)
+    cv2.putText(orig, "{}".format(j),
+                 (int(x - 50), int(y - 20)), cv2.FONT_HERSHEY_SIMPLEX,
+                 0.8, (175 + j, 39 + j, 45 + j), 2)
+    showMyImage(orig,45)
 print( "total error: {}".format(mean_error/len(points_on_object)) )
 print(type(ret),type(mtx),type(dist),type(rvecs),type(tvecs))
 
@@ -126,4 +142,6 @@ for fname in images:
     print(f"xAng = {xAng}, yAng = {yAng}, zAng = {zAng}")
     img = draw(img,corners2,imgpts,xAng,yAng,zAng)
     showMyImage(img,30)
+ else:
+    showMyImage(img, 25)
 cv2.destroyAllWindows()

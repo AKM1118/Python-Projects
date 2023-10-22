@@ -17,8 +17,8 @@ def draw(img, corners, imgpts, xAng, yAng, zAng):
              cv2.FONT_HERSHEY_SIMPLEX, 6, (255, 0, 0), 5)
  cv2.putText(img, "yAng {:.4f}".format(yAng), ((int(imgy[0]),int(imgy[1]-10))),
              cv2.FONT_HERSHEY_SIMPLEX, 6, (0, 255, 0), 5)
- cv2.putText(img, "zAng {:.4f}".format(zAng), ((int(imgz[0]),int(imgz[1]-10))),
-             cv2.FONT_HERSHEY_SIMPLEX, 6, (0, 0, 255), 5)
+ #cv2.putText(img, "zAng {:.4f}".format(zAng), ((int(imgz[0]),int(imgz[1]-10))),
+ #            cv2.FONT_HERSHEY_SIMPLEX, 6, (0, 0, 255), 5)
  return img
 
 def resizeImage(img, scale):

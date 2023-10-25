@@ -1,3 +1,4 @@
+# Obsolete module or testing calibration techniques
 # import the necessary packages
 from scipy.spatial import distance as dist
 from imutils import perspective

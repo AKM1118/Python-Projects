@@ -1,3 +1,4 @@
+# Obsolete module for object detection based on template matching
 # import the necessary packages
 from scipy.spatial import distance as dist
 from imutils import perspective

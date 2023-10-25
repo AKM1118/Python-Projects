@@ -1,3 +1,4 @@
+# Obsolete module for size calculation for big images based on a reference object
 # import the necessary packages
 from scipy.spatial import distance as dist
 from imutils import perspective

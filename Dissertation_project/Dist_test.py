@@ -1,3 +1,4 @@
+# Obsolete module for distance calculation inside the marks based on corner points
 import argparse
 import cv2
 import imutils

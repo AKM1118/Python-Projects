@@ -1,4 +1,4 @@
-# import the necessary packages
+# Obsolete module for distance calculation for big images based on a reference object
 from scipy.spatial import distance as dist
 from imutils import perspective
 from imutils import contours

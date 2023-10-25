@@ -1,3 +1,4 @@
+# Obsolete module for SIFT, ORB functionality testing
 import argparse
 import cv2
 import imutils
@@ -9,6 +10,8 @@ from scipy.spatial import distance as dist
 
 import rawpy
 import imageio
+
+
 def approx_sorter(tup_list):
     for i in range(len(tup_list)):
         already_sorted = True

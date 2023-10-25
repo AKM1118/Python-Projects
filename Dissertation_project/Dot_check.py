@@ -1,3 +1,4 @@
+# Obsolete module for testing corner point detection on marks
 import argparse
 import cv2
 import imutils

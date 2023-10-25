@@ -3,20 +3,23 @@ import numpy as np
 import cv2
 import glob
 import math
+import Main
+
+print(Main.a)
 def draw(img, corners, imgpts, xAng, yAng, zAng):
  corner = tuple(corners[0].ravel())
  imgx = tuple(imgpts[0].ravel())
  imgy = tuple(imgpts[1].ravel())
  imgz = tuple(imgpts[2].ravel())
- print(corner)
- print(tuple(imgpts[0].ravel()))
- img = cv2.line(img, (int(corner[0]),int(corner[1])), (int(imgx[0]),int(imgx[1])), (255,0,0), 5)
- img = cv2.line(img, (int(corner[0]),int(corner[1])), (int(imgy[0]),int(imgy[1])), (0,255,0), 5)
+ #print(corner)
+ #print(tuple(imgpts[0].ravel()))
+ img = cv2.line(img, (int(corner[0]),int(corner[1])), (int(imgx[0]),int(imgx[1])), (0,255,0), 5)
+ img = cv2.line(img, (int(corner[0]),int(corner[1])), (int(imgy[0]),int(imgy[1])), (255,0,0), 5)
  img = cv2.line(img, (int(corner[0]),int(corner[1])), (int(imgz[0]),int(imgz[1])), (0,0,255), 5)
  cv2.putText(img, "xAng {:.4f}".format(xAng), ((int(imgx[0]),int(imgx[1]-10))),
-             cv2.FONT_HERSHEY_SIMPLEX, 6, (255, 0, 0), 5)
+             cv2.FONT_HERSHEY_SIMPLEX,3 , (0, 255, 0), 5)
  cv2.putText(img, "yAng {:.4f}".format(yAng), ((int(imgy[0]),int(imgy[1]-10))),
-             cv2.FONT_HERSHEY_SIMPLEX, 6, (0, 255, 0), 5)
+             cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 5)
  #cv2.putText(img, "zAng {:.4f}".format(zAng), ((int(imgz[0]),int(imgz[1]-10))),
  #            cv2.FONT_HERSHEY_SIMPLEX, 6, (0, 0, 255), 5)
  return img
@@ -114,17 +117,20 @@ object_points_test = np.zeros((4*9, 3), np.float32)
 object_points_test[:, :2] = np.mgrid[0:4, 0:9].T.reshape(-1, 2)
 for frame in image_test:
  img = cv2.imread(frame)
+ cp = img.copy()
  gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
  ret, corners = cv2.findChessboardCorners(gray, (4,9),None)
  if ret == True:
     corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
+    cv2.drawChessboardCorners(cp, (4, 9), corners, ret)
     # Find the rotation and translation vectors.
     ret,rvecs, tvecs = cv2.solvePnP(object_points_test, corners2, mtx, dist)
+
     # project 3D points to image plane
     imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
 
     Rmtx = cv2.Rodrigues(rvecs)
-
+    print(f"tvecs is {tvecs}, rvecs is {Rmtx}")
     print(Rmtx[0])
     sy = math.sqrt(Rmtx[0][0][0] * Rmtx[0][0][0] + Rmtx[0][1][0] * Rmtx[0][1][0])
     xAng = math.degrees(math.atan2(Rmtx[0][2][1], Rmtx[0][2][2]))
@@ -133,6 +139,7 @@ for frame in image_test:
     print(f"xAng = {xAng}, yAng = {yAng}, zAng = {zAng}")
     img = draw(img,corners2,imgpts,xAng,yAng,zAng)
     showMyImage(img,30)
+    showMyImage(cp, 30)
 cv2.destroyAllWindows()
 
 
@@ -142,7 +149,7 @@ cv2.destroyAllWindows()
 for fname in images:
  img = cv2.imread(fname)
  gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
- ret, corners = cv2.findChessboardCorners(gray, (6,9),None)
+ ret, corners = cv2.findChessboardCorners(gray, (4,7),None)
  if ret == True:
     corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
     # Find the rotation and translation vectors.
@@ -160,5 +167,7 @@ for fname in images:
     print(f"xAng = {xAng}, yAng = {yAng}, zAng = {zAng}")
     img = draw(img,corners2,imgpts,xAng,yAng,zAng)
     showMyImage(img,30)
+ else:
+    showMyImage(img, 10)
 cv2.destroyAllWindows()
 """

@@ -1,3 +1,5 @@
+# Module to test the results of a calibrated image by projecting the points using the camera parameters
+# You can store the results as an excel table
 # Takes in an array of corner points of a chessboard, calibration parameters and then compares the effectiveness of calibration parameters
 import glob
 

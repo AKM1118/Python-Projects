@@ -3,9 +3,9 @@ import numpy as np
 import cv2
 import glob
 import math
-import Main
+#import Main
 
-print(Main.a)
+#print(Main.a)
 def draw(img, corners, imgpts, xAng, yAng, zAng):
  corner = tuple(corners[0].ravel())
  imgx = tuple(imgpts[0].ravel())
@@ -52,7 +52,7 @@ points_on_object = []
 points_on_image = []
 # find all images used for calibration
 images = glob.glob('*.jpg')
-image_test = glob.glob('test_image/*.JPG')
+image_test = glob.glob('Dist_detect_7/*.JPG')
 # perform corner point extraction for every image found in the folder
 if a is None:
     for fname in images:
@@ -113,16 +113,17 @@ if a is None:
         print( "total error: {}".format(mean_error/len(points_on_object)) )
         print(type(ret),type(mtx),type(dist),type(rvecs),type(tvecs))
 
-object_points_test = np.zeros((4*9, 3), np.float32)
-object_points_test[:, :2] = np.mgrid[0:4, 0:9].T.reshape(-1, 2)
+object_points_test = np.zeros((4*7, 3), np.float32)
+object_points_test[:, :2] = np.mgrid[0:4, 0:7].T.reshape(-1, 2)
 for frame in image_test:
  img = cv2.imread(frame)
  cp = img.copy()
  gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
- ret, corners = cv2.findChessboardCorners(gray, (4,9),None)
+ ret, corners = cv2.findChessboardCorners(gray, (4,7),None)
+ print(ret)
  if ret == True:
     corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
-    cv2.drawChessboardCorners(cp, (4, 9), corners, ret)
+    # cv2.drawChessboardCorners(cp, (4, 9), corners, ret)
     # Find the rotation and translation vectors.
     ret,rvecs, tvecs = cv2.solvePnP(object_points_test, corners2, mtx, dist)
 
@@ -139,7 +140,7 @@ for frame in image_test:
     print(f"xAng = {xAng}, yAng = {yAng}, zAng = {zAng}")
     img = draw(img,corners2,imgpts,xAng,yAng,zAng)
     showMyImage(img,30)
-    showMyImage(cp, 30)
+    #showMyImage(cp, 30)
 cv2.destroyAllWindows()
 
 

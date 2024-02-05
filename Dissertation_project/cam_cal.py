@@ -4,10 +4,21 @@ import cv2
 import glob
 import math
 import time
+import xlwt
 from functools import wraps
 #import Main
 
 #print(Main.a)
+def WriteToExcel(workbook, sheetName, angle_list):
+    sheet1 = workbook.add_sheet(sheetName)
+
+    for i in range(len(angle_list)):
+        x, y, z = angle_list[i]
+        sheet1.write(0, i, x)
+        sheet1.write(1, i, y)
+        sheet1.write(2, i, z)
+    workbook.save("experiment results.xls")
+
 def timeToComplete(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -99,6 +110,7 @@ def getCorners(image,board_x,board_y):
     print(ret)
     return ret,corners, gray
 def main():
+
     try:
         cam_params = np.load(calib_param_path)
     except OSError:
@@ -108,7 +120,7 @@ def main():
             raise Exception('No calibration images found, please choose a different folder')
         getInnerParam(calib_images,board_x_cal,board_y_cal,save_path)
         cam_params = np.load(calib_param_path)
-
+    experiment_img = glob.glob(experiment)
     mtx = cam_params['mtx']
     dist = cam_params['dist']
     print(f"mtx = {mtx} # "
@@ -117,9 +129,8 @@ def main():
     image_test = glob.glob(detect_img_path)
     object_points = np.zeros((board_y_detect * board_x_detect, 3), np.float32)
     object_points[:, :2] = np.mgrid[0:board_y_detect, 0:board_x_detect].T.reshape(-1, 2)
-
-    for frame in image_test:
-        ret, corners, gray = getCorners(frame,board_x_detect,board_y_detect)
+    for frame in experiment_img:
+        ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
         img = cv2.imread(frame)
         if ret == True:
             corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
@@ -130,9 +141,25 @@ def main():
             # project 3D points to image plane
             imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
             xAng, yAng, zAng = getAngles(rvecs)
-            img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
-            showMyImage(img, 30)
-            # showMyImage(cp, 30)
+            angle_arr.append((xAng, yAng, zAng))
+            #img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
+            #showMyImage(img, 30)
+    WriteToExcel(workbook,"results",angle_arr)
+    #for frame in image_test:
+    #    ret, corners, gray = getCorners(frame,board_x_detect,board_y_detect)
+    #    img = cv2.imread(frame)
+    #    if ret == True:
+    #        corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+#
+ #           # Find the rotation and translation vectors.
+ #           ret, rvecs, tvecs = cv2.solvePnP(object_points, corners2, mtx, dist)
+#
+#            # project 3D points to image plane
+#            imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
+#            xAng, yAng, zAng = getAngles(rvecs)
+#            img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
+#            showMyImage(img, 30)
+#            # showMyImage(cp, 30)
     cv2.destroyAllWindows()
 
 # Constants
@@ -141,8 +168,8 @@ def main():
 board_x_cal = 10
 board_y_cal = 7
 
-board_x_detect = 3
-board_y_detect = 7
+board_x_detect = 9
+board_y_detect = 6
 # criteria for sub pixel corner detection
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -161,8 +188,15 @@ calib_param_path = 'cam_param.npz'
 detect_img_path = 'Dist_detect_4/*.JPG'
 save_path = 'cam_param'
 
-# Get inner parameters if there are none
+# file paths for experiments
+experiment = 'Experiment_3/*.jpg'
 
+# excel base for writing
+workbook = xlwt.Workbook()
+style = xlwt.easyxf('font: bold 1')
+
+# array to store angle values
+angle_arr = []
 
 if __name__ == "__main__":
     main()

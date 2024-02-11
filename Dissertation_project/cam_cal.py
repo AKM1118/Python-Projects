@@ -9,6 +9,8 @@ from functools import wraps
 #import Main
 
 #print(Main.a)
+
+
 def WriteToExcel(workbook, sheetName, angle_list):
     sheet1 = workbook.add_sheet(sheetName)
 
@@ -29,6 +31,33 @@ def timeToComplete(func):
         print((f"{func.__name__} is done in {time_end} s"))
         return val
     return wrapper
+
+def divideImage(images):
+    cur_board = 0
+    cur_image = 1
+    # coordinates table for excess board removal
+    coord_dict_p1 = {0 : (1188,875), 1 : (1531, 878), 2 : (1866, 883),
+                    3 : (1193, 1114), 4 : (1530, 1117), 5 : (1866, 1119),
+                    6 : (1193, 1354), 7 : (1529, 1352), 8 : (1865, 1354)}
+    coord_dict_p2 = {0: (1463, 1078), 1: (1804, 1080), 2: (2135, 1082),
+                    3: (1467, 1317), 4: (1801, 1318), 5: (2134, 1318),
+                    6: (1466, 1556), 7: (1802, 1555), 8: (2134, 1554)}
+    for frame in images:
+        orig = cv2.imread(frame)
+        for cur_board in range(9):
+            result = orig.copy()
+            for i in coord_dict_p1.keys():
+                if i == cur_board:
+                    continue
+                p1 = coord_dict_p1.get(i)
+                p2 = coord_dict_p2.get(i)
+                result = cv2.rectangle(result,p1,p2,(125,125,125),thickness=-1)
+                #showMyImage(result, 30)
+
+            cv2.imwrite(f"Prepared_Images/Image_{cur_board}_{cur_image}.jpg", result)
+        print(f"Image {cur_image} is done")
+        cur_board = 0
+        cur_image += 1
 @timeToComplete
 def draw(image, corners, imgpts, xAng, yAng, zAng):
  img = cv2.imread(image)
@@ -110,6 +139,9 @@ def getCorners(image,board_x,board_y):
     print(ret)
     return ret,corners, gray
 def main():
+    board_images = glob.glob(board_img_path)
+    divideImage(board_images)
+    return
 
     try:
         cam_params = np.load(calib_param_path)
@@ -190,6 +222,9 @@ save_path = 'cam_param'
 
 # file paths for experiments
 experiment = 'Experiment_3/*.jpg'
+
+# file paths for experiments
+board_img_path = '9_boards_90_photos/*.jpg'
 
 # excel base for writing
 workbook = xlwt.Workbook()

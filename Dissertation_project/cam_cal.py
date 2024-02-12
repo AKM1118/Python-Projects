@@ -13,13 +13,16 @@ from functools import wraps
 
 def WriteToExcel(workbook, sheetName, angle_list):
     sheet1 = workbook.add_sheet(sheetName)
-
+    sheet1.write(0, 0, "x Angle")
+    sheet1.write(0, 1, "y Angle")
+    sheet1.write(0, 2, "z Angle")
     for i in range(len(angle_list)):
         x, y, z = angle_list[i]
-        sheet1.write(0, i, x)
-        sheet1.write(1, i, y)
-        sheet1.write(2, i, z)
-    workbook.save("experiment results.xls")
+
+        sheet1.write(i+1, 0, x)
+        sheet1.write(i+1, 1, y)
+        sheet1.write(i+1, 2, z)
+    workbook.save("experiment results 6.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -139,9 +142,11 @@ def getCorners(image,board_x,board_y):
     print(ret)
     return ret,corners, gray
 def main():
-    board_images = glob.glob(board_img_path)
-    divideImage(board_images)
-    return
+
+    # Uncomment this if you want to generate new sets
+    #board_images = glob.glob(board_img_path)
+    #divideImage(board_images)
+    #return
 
     try:
         cam_params = np.load(calib_param_path)
@@ -157,7 +162,7 @@ def main():
     dist = cam_params['dist']
     print(f"mtx = {mtx} # "
           f"dist = {dist} # ")
-
+    i = 1
     image_test = glob.glob(detect_img_path)
     object_points = np.zeros((board_y_detect * board_x_detect, 3), np.float32)
     object_points[:, :2] = np.mgrid[0:board_y_detect, 0:board_x_detect].T.reshape(-1, 2)
@@ -176,6 +181,8 @@ def main():
             angle_arr.append((xAng, yAng, zAng))
             #img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
             #showMyImage(img, 30)
+            print(f"image {i} is done")
+            i += 1
     WriteToExcel(workbook,"results",angle_arr)
     #for frame in image_test:
     #    ret, corners, gray = getCorners(frame,board_x_detect,board_y_detect)
@@ -200,8 +207,8 @@ def main():
 board_x_cal = 10
 board_y_cal = 7
 
-board_x_detect = 9
-board_y_detect = 6
+board_x_detect = 10
+board_y_detect = 7
 # criteria for sub pixel corner detection
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -217,11 +224,11 @@ points_on_image = []
 # file paths for calibration and detection
 calib_img_path = 'Cam_calib_1/*.JPG'
 calib_param_path = 'cam_param.npz'
-detect_img_path = 'Dist_detect_4/*.JPG'
+detect_img_path = 'Dist_detect_5/*.JPG'
 save_path = 'cam_param'
 
 # file paths for experiments
-experiment = 'Experiment_3/*.jpg'
+experiment = 'Prepared_Images/Set_4/*.jpg'
 
 # file paths for experiments
 board_img_path = '9_boards_90_photos/*.jpg'

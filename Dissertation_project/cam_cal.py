@@ -22,7 +22,7 @@ def WriteToExcel(workbook, sheetName, angle_list):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save("experiment results 6.xls")
+    workbook.save("experiment results 4.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -160,6 +160,8 @@ def main():
     experiment_img = glob.glob(experiment)
     mtx = cam_params['mtx']
     dist = cam_params['dist']
+    mtx = np.array([[1,0,1],[0,1,1],[0,0,1]], dtype=np.float64)
+    dist = np.array([0,0,0,0,0], dtype=np.float64)
     print(f"mtx = {mtx} # "
           f"dist = {dist} # ")
     i = 1
@@ -228,7 +230,7 @@ detect_img_path = 'Dist_detect_5/*.JPG'
 save_path = 'cam_param'
 
 # file paths for experiments
-experiment = 'Prepared_Images/Set_4/*.jpg'
+experiment = 'Prepared_Images/Set_3/*.jpg'
 
 # file paths for experiments
 board_img_path = '9_boards_90_photos/*.jpg'

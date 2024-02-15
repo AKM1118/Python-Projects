@@ -22,7 +22,7 @@ def WriteToExcel(workbook, sheetName, angle_list):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save("experiment results 4.xls")
+    workbook.save("experiment results 5.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -230,7 +230,7 @@ detect_img_path = 'Dist_detect_5/*.JPG'
 save_path = 'cam_param'
 
 # file paths for experiments
-experiment = 'Prepared_Images/Set_3/*.jpg'
+experiment = 'Prepared_Images/Set_4/*.jpg'
 
 # file paths for experiments
 board_img_path = '9_boards_90_photos/*.jpg'

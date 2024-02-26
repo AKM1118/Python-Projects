@@ -12,7 +12,8 @@ from functools import wraps
 
 
 def WriteToExcel(workbook, sheetName, angle_list, set_number):
-    sheet1 = workbook.add_sheet(f"{sheetName} {set_number}")
+    #sheet1 = workbook.add_sheet(f"{sheetName} {set_number}")
+    sheet1 = workbook.add_sheet(f"results")
     sheet1.write(0, 0, "x Angle")
     sheet1.write(0, 1, "y Angle")
     sheet1.write(0, 2, "z Angle")
@@ -22,7 +23,7 @@ def WriteToExcel(workbook, sheetName, angle_list, set_number):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save(f"experiment results {set_number} 180.xls")
+    workbook.save(f"experiment results 9 180.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -39,12 +40,12 @@ def divideImage(images):
     cur_board = 0
     cur_image = 1
     # coordinates table for excess board removal
-    coord_dict_p1 = {0 : (1188-50,875+30), 1 : (1531-50, 878+30), 2 : (1866-50, 883+30),
-                    3 : (1193-50, 1114+30), 4 : (1530-50, 1117+30), 5 : (1866-50, 1119+30),
-                    6 : (1193-50, 1354+30), 7 : (1529-50, 1352+30), 8 : (1865-50, 1354+30)}
-    coord_dict_p2 = {0: (1463-50, 1078+30), 1: (1804-50, 1080+30), 2: (2135-50, 1082+30),
-                    3: (1467-50, 1317+30), 4: (1801-50, 1318+30), 5: (2134-50, 1318+30),
-                    6: (1466-50, 1556+30), 7: (1802-50, 1555+30), 8: (2134-50, 1554+30)}
+    coord_dict_p1 = {0 : (1188-50,875+10), 1 : (1531-50, 878+10), 2 : (1866-20, 883+10),
+                    3 : (1193-50, 1114+30), 4 : (1530-50, 1117+30), 5 : (1866-20, 1119+30),
+                    6 : (1193-50, 1354+30), 7 : (1529-50, 1352+30), 8 : (1865-20, 1354+30)}
+    coord_dict_p2 = {0: (1463-50, 1078+10), 1: (1804-50, 1080+10), 2: (2135-20, 1082+10),
+                    3: (1467-50, 1317+30), 4: (1801-50, 1318+30), 5: (2134-20, 1318+30),
+                    6: (1466-50, 1556+30), 7: (1802-50, 1555+30), 8: (2134-20, 1554+30)}
     for frame in images:
         orig = cv2.imread(frame)
         for cur_board in range(9):
@@ -171,36 +172,35 @@ def main():
     image_test = glob.glob(detect_img_path)
     object_points = np.zeros((board_y_detect * board_x_detect, 3), np.float32)
     object_points[:, :2] = np.mgrid[0:board_y_detect, 0:board_x_detect].T.reshape(-1, 2)
-    for k in range(1,10):
-        i = 1
-        experiment_img = glob.glob(f'Set_0_{k}/*.jpg')
-        for frame in experiment_img:
-            ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
-            img = cv2.imread(frame)
-            if ret == True:
-                corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+    i = 1
+    experiment_img = glob.glob(f'Set_0_9/*.jpg')
+    for frame in experiment_img:
+        ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
+        img = cv2.imread(frame)
+        if ret == True:
+            corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
 
-                # Find the rotation and translation vectors.
-                ret, rvecs, tvecs = cv2.solvePnP(object_points, corners2, mtx, dist)
+            # Find the rotation and translation vectors.
+            ret, rvecs, tvecs = cv2.solvePnP(object_points, corners2, mtx, dist)
 
-                # project 3D points to image plane
-                imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
-                xAng, yAng, zAng = getAngles(rvecs)
-                angle_arr.append((xAng, yAng, zAng))
-                #h, w = img.shape[:2]
-                #object_points = np.zeros((6 * 9, 3), np.float32)
-                #object_points[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
-                #print("###### optimizing the matrix ######")
-                #newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
-                #undist = cv2.undistort(img, mtx, dist, None, newcameramtx)
-                #imgpoints2, _ = cv2.projectPoints(object_points, rvecs, tvecs, mtx, dist)
-                #img = draw(undist, corners2, imgpts, xAng, yAng, zAng)
-                #img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
-                #showMyImage(undist, 30)
-                print(f"image {i} is done")
-                i += 1
-        print(f"set {k} is done")
-        WriteToExcel(workbook,"results",angle_arr,k)
+            # project 3D points to image plane
+            imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
+            xAng, yAng, zAng = getAngles(rvecs)
+            angle_arr.append((xAng, yAng, zAng))
+            #h, w = img.shape[:2]
+            #object_points = np.zeros((6 * 9, 3), np.float32)
+            #object_points[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
+            #print("###### optimizing the matrix ######")
+            #newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+            #undist = cv2.undistort(img, mtx, dist, None, newcameramtx)
+            #imgpoints2, _ = cv2.projectPoints(object_points, rvecs, tvecs, mtx, dist)
+            #img = draw(undist, corners2, imgpts, xAng, yAng, zAng)
+            #img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
+            #showMyImage(undist, 30)
+            print(f"image {i} is done")
+            i += 1
+        #print(f"set {k} is done")
+    WriteToExcel(workbook,"results",angle_arr,1)
 
 
     # for frame in experiment_img:

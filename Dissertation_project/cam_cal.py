@@ -42,10 +42,10 @@ def divideImage(images):
     # coordinates table for excess board removal
     coord_dict_p1 = {0 : (1188-50,875+10), 1 : (1531-50, 878+10), 2 : (1866-20, 883+10),
                     3 : (1193-50, 1114+30), 4 : (1530-50, 1117+30), 5 : (1866-20, 1119+30),
-                    6 : (1193-50, 1354+30), 7 : (1529-50, 1352+30), 8 : (1865-20, 1354+30)}
+                    6 : (1193-50, 1354+30), 7 : (1529-50, 1352+70), 8 : (1865-20, 1354+30)}
     coord_dict_p2 = {0: (1463-50, 1078+10), 1: (1804-50, 1080+10), 2: (2135-20, 1082+10),
                     3: (1467-50, 1317+30), 4: (1801-50, 1318+30), 5: (2134-20, 1318+30),
-                    6: (1466-50, 1556+30), 7: (1802-50, 1555+30), 8: (2134-20, 1554+30)}
+                    6: (1466-50, 1556+30), 7: (1802-50, 1555+70), 8: (2134-20, 1554+30)}
     for frame in images:
         orig = cv2.imread(frame)
         for cur_board in range(9):
@@ -58,7 +58,7 @@ def divideImage(images):
                 result = cv2.rectangle(result,p1,p2,(125,125,125),thickness=-1)
                 #showMyImage(result, 30)
 
-            cv2.imwrite(f"Prepared_Images_2/Image_{cur_board}_{cur_image}.jpg", result)
+            cv2.imwrite(f"Prepared_Images_3/Image_{cur_board}_{cur_image}.jpg", result)
         print(f"Image {cur_image} is done")
         cur_board = 0
         cur_image += 1
@@ -162,8 +162,8 @@ def main():
 
     mtx = cam_params['mtx']
     dist = cam_params['dist']
-    #mtx = np.array([[1,0,1],[0,1,1],[0,0,1]], dtype=np.float64)
-    #dist = np.array([0,0,0,0,0], dtype=np.float64)
+    #mtx = np.array([[3.43574317e+03 ,0,1],[0,3.45279984e+03 ,1],[0,0,1]], dtype=np.float64)
+    dist = np.array([0,0,0,0,0], dtype=np.float64)
     print(f"mtx = {mtx} # "
           f"dist = {dist} # ")
     i = 1
@@ -173,7 +173,10 @@ def main():
     object_points = np.zeros((board_y_detect * board_x_detect, 3), np.float32)
     object_points[:, :2] = np.mgrid[0:board_y_detect, 0:board_x_detect].T.reshape(-1, 2)
     i = 1
-    experiment_img = glob.glob(f'Set_0_9/*.jpg')
+    experiment_img = glob.glob(f'Set_1_0/*.jpg')
+    xArr = []
+    yArr = []
+    zArr = []
     for frame in experiment_img:
         ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
         img = cv2.imread(frame)
@@ -186,6 +189,9 @@ def main():
             # project 3D points to image plane
             imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
             xAng, yAng, zAng = getAngles(rvecs)
+            #xArr.append(xAng)
+            #yArr.append(yAng)
+            #zArr.append(zAng)
             angle_arr.append((xAng, yAng, zAng))
             #h, w = img.shape[:2]
             #object_points = np.zeros((6 * 9, 3), np.float32)
@@ -196,11 +202,11 @@ def main():
             #imgpoints2, _ = cv2.projectPoints(object_points, rvecs, tvecs, mtx, dist)
             #img = draw(undist, corners2, imgpts, xAng, yAng, zAng)
             #img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
-            #showMyImage(undist, 30)
+            #showMyImage(img, 30)
             print(f"image {i} is done")
             i += 1
         #print(f"set {k} is done")
-    WriteToExcel(workbook,"results",angle_arr,1)
+    #WriteToExcel(workbook,"results",angle_arr,1)
 
 
     # for frame in experiment_img:
@@ -269,7 +275,7 @@ save_path = 'cam_param'
 experiment = 'Set_0_2/*.jpg'
 # file paths for experiments
 #board_img_path = '9_boards_90_photos/*.jpg'
-board_img_path = '9_boards_180_photos/*.jpg'
+board_img_path = '9_boards_6_photos/*.jpg'
 # excel base for writing
 workbook = xlwt.Workbook()
 style = xlwt.easyxf('font: bold 1')

@@ -10,9 +10,10 @@ sigma_x = [fitdist(experimentresults1.xAngle,'Normal').sigma fitdist(experimentr
 sigma_y = [fitdist(experimentresults1.yAngle,'Normal').sigma fitdist(experimentresults2.yAngle,'Normal').sigma fitdist(experimentresults3.yAngle,'Normal').sigma; fitdist(experimentresults4.yAngle,'Normal').sigma fitdist(experimentresults5.yAngle,'Normal').sigma fitdist(experimentresults6.yAngle,'Normal').sigma; fitdist(experimentresults7.yAngle,'Normal').sigma fitdist(experimentresults8.yAngle,'Normal').sigma fitdist(experimentresults9.yAngle,'Normal').sigma];
 sigma_z = [fitdist(experimentresults1.zAngle,'Normal').sigma fitdist(experimentresults2.zAngle,'Normal').sigma fitdist(experimentresults3.zAngle,'Normal').sigma; fitdist(experimentresults4.zAngle,'Normal').sigma fitdist(experimentresults5.zAngle,'Normal').sigma fitdist(experimentresults6.zAngle,'Normal').sigma; fitdist(experimentresults7.zAngle,'Normal').sigma fitdist(experimentresults8.zAngle,'Normal').sigma fitdist(experimentresults9.zAngle,'Normal').sigma];
 
-figure
+
+figure;
 t_x = tiledlayout(3,3);
-title(t_x,'xAngle');
+title(t_x,'xAngle')
 nexttile;
 histfit(experimentresults1.xAngle);
 nexttile;
@@ -33,9 +34,10 @@ nexttile;
 histfit(experimentresults9.xAngle);
 
 
+
 figure
 t_y = tiledlayout(3,3);
-title(t_y,'yAngle');
+title(t_y,'yAngle')
 nexttile;
 histfit(experimentresults1.yAngle);
 nexttile;
@@ -58,7 +60,7 @@ histfit(experimentresults9.yAngle);
 
 figure
 t_z = tiledlayout(3,3);
-title(t_z,'zAngle');
+title(t_z,'zAngle')
 nexttile;
 histfit(experimentresults1.zAngle);
 nexttile;
@@ -77,3 +79,71 @@ nexttile;
 histfit(experimentresults8.zAngle);
 nexttile;
 histfit(experimentresults9.zAngle);
+
+% figure
+% t_x = tiledlayout(3,3);
+% title(t_x,'xAngle');
+% nexttile;
+% histfit(experimentresults1.xAngle);
+% nexttile;
+% histfit(experimentresults2.xAngle);
+% nexttile;
+% histfit(experimentresults3.xAngle);
+% nexttile;
+% histfit(experimentresults4.xAngle);
+% nexttile;
+% histfit(experimentresults5.xAngle);
+% nexttile;
+% histfit(experimentresults6.xAngle);
+% nexttile;
+% histfit(experimentresults7.xAngle);
+% nexttile;
+% histfit(experimentresults8.xAngle);
+% nexttile;
+% histfit(experimentresults9.xAngle);
+
+
+% figure
+% t_y = tiledlayout(3,3);
+% title(t_y,'yAngle');
+% nexttile;
+% histfit(experimentresults1.yAngle);
+% nexttile;
+% histfit(experimentresults2.yAngle);
+% nexttile;
+% histfit(experimentresults3.yAngle);
+% nexttile;
+% histfit(experimentresults4.yAngle);
+% nexttile;
+% histfit(experimentresults5.yAngle);
+% nexttile;
+% histfit(experimentresults6.yAngle);
+% nexttile;
+% histfit(experimentresults7.yAngle);
+% nexttile;
+% histfit(experimentresults8.yAngle);
+% nexttile;
+% histfit(experimentresults9.yAngle);
+
+
+% figure
+% t_z = tiledlayout(3,3);
+% title(t_z,'zAngle');
+% nexttile;
+% histfit(experimentresults1.zAngle);
+% nexttile;
+% histfit(experimentresults2.zAngle);
+% nexttile;
+% histfit(experimentresults3.zAngle);
+% nexttile;
+% histfit(experimentresults4.zAngle);
+% nexttile;
+% histfit(experimentresults5.zAngle);
+% nexttile;
+% histfit(experimentresults6.zAngle);
+% nexttile;
+% histfit(experimentresults7.zAngle);
+% nexttile;
+% histfit(experimentresults8.zAngle);
+% nexttile;
+% histfit(experimentresults9.zAngle);

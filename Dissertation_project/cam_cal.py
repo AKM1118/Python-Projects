@@ -11,8 +11,8 @@ from functools import wraps
 #print(Main.a)
 
 
-def WriteToExcel(workbook, sheetName, angle_list, set_number):
-    #sheet1 = workbook.add_sheet(f"{sheetName} {set_number}")
+def WriteToExcel(sheetName, angle_list, set_number):
+    workbook = xlwt.Workbook()
     sheet1 = workbook.add_sheet(f"results")
     sheet1.write(0, 0, "x Angle")
     sheet1.write(0, 1, "y Angle")
@@ -23,7 +23,7 @@ def WriteToExcel(workbook, sheetName, angle_list, set_number):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save(f"experiment results 9 180.xls")
+    workbook.save(f"experiment results {set_number} 180.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -162,8 +162,8 @@ def main():
 
     mtx = cam_params['mtx']
     dist = cam_params['dist']
-    #mtx = np.array([[3.43574317e+03 ,0,1],[0,3.45279984e+03 ,1],[0,0,1]], dtype=np.float64)
-    dist = np.array([0,0,0,0,0], dtype=np.float64)
+    mtx = np.array([[3.432e+03, 0, 1.62588e+03], [0, 3.456e+03, 2.20795e+03], [0, 0, 1]], dtype=np.float64)
+    #dist = np.array([0,0,0,0,0], dtype=np.float64)
     print(f"mtx = {mtx} # "
           f"dist = {dist} # ")
     i = 1
@@ -172,27 +172,32 @@ def main():
     image_test = glob.glob(detect_img_path)
     object_points = np.zeros((board_y_detect * board_x_detect, 3), np.float32)
     object_points[:, :2] = np.mgrid[0:board_y_detect, 0:board_x_detect].T.reshape(-1, 2)
-    i = 1
+    #i = 1
+
     experiment_img = glob.glob(f'Set_1_0/*.jpg')
     xArr = []
     yArr = []
     zArr = []
-    for frame in experiment_img:
-        ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
-        img = cv2.imread(frame)
-        if ret == True:
-            corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+    for k in range(1,10):
+        angle_arr = []
+        experiment_img = glob.glob(f'Set_0_{k}/*.jpg')
+        i = 1
+        for frame in experiment_img:
+            ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
+            img = cv2.imread(frame)
+            if ret == True:
+                corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
 
             # Find the rotation and translation vectors.
-            ret, rvecs, tvecs = cv2.solvePnP(object_points, corners2, mtx, dist)
+                ret, rvecs, tvecs = cv2.solvePnP(object_points, corners2, mtx, dist)
 
             # project 3D points to image plane
-            imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
-            xAng, yAng, zAng = getAngles(rvecs)
+                imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
+                xAng, yAng, zAng = getAngles(rvecs)
             #xArr.append(xAng)
             #yArr.append(yAng)
             #zArr.append(zAng)
-            angle_arr.append((xAng, yAng, zAng))
+                angle_arr.append((xAng, yAng, zAng))
             #h, w = img.shape[:2]
             #object_points = np.zeros((6 * 9, 3), np.float32)
             #object_points[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
@@ -203,10 +208,10 @@ def main():
             #img = draw(undist, corners2, imgpts, xAng, yAng, zAng)
             #img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
             #showMyImage(img, 30)
-            print(f"image {i} is done")
-            i += 1
-        #print(f"set {k} is done")
-    #WriteToExcel(workbook,"results",angle_arr,1)
+                print(f"image {i} is done")
+                i += 1
+        print(f"set {k} is done")
+        WriteToExcel("results",angle_arr,k)
 
 
     # for frame in experiment_img:
@@ -277,8 +282,7 @@ experiment = 'Set_0_2/*.jpg'
 #board_img_path = '9_boards_90_photos/*.jpg'
 board_img_path = '9_boards_6_photos/*.jpg'
 # excel base for writing
-workbook = xlwt.Workbook()
-style = xlwt.easyxf('font: bold 1')
+
 
 # array to store angle values
 angle_arr = []

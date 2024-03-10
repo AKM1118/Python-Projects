@@ -23,7 +23,7 @@ def WriteToExcel(sheetName, angle_list, set_number):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save(f"experiment results {set_number} 180.xls")
+    workbook.save(f"experiment results 0 calib {set_number} 6.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -42,10 +42,10 @@ def divideImage(images):
     # coordinates table for excess board removal
     coord_dict_p1 = {0 : (1188-50,875+10), 1 : (1531-50, 878+10), 2 : (1866-20, 883+10),
                     3 : (1193-50, 1114+30), 4 : (1530-50, 1117+30), 5 : (1866-20, 1119+30),
-                    6 : (1193-50, 1354+30), 7 : (1529-50, 1352+70), 8 : (1865-20, 1354+30)}
+                    6 : (1193-50, 1354+70), 7 : (1529-50, 1352+70), 8 : (1865-20, 1354+70)}
     coord_dict_p2 = {0: (1463-50, 1078+10), 1: (1804-50, 1080+10), 2: (2135-20, 1082+10),
                     3: (1467-50, 1317+30), 4: (1801-50, 1318+30), 5: (2134-20, 1318+30),
-                    6: (1466-50, 1556+30), 7: (1802-50, 1555+70), 8: (2134-20, 1554+30)}
+                    6: (1466-50, 1556+70), 7: (1802-50, 1555+70), 8: (2134-20, 1554+70)}
     for frame in images:
         orig = cv2.imread(frame)
         for cur_board in range(9):
@@ -58,10 +58,11 @@ def divideImage(images):
                 result = cv2.rectangle(result,p1,p2,(125,125,125),thickness=-1)
                 #showMyImage(result, 30)
 
-            cv2.imwrite(f"Prepared_Images_3/Image_{cur_board}_{cur_image}.jpg", result)
+            cv2.imwrite(f"Prepared_Images_2/Image_{cur_board}_{cur_image}.jpg", result)
         print(f"Image {cur_image} is done")
         cur_board = 0
         cur_image += 1
+
 @timeToComplete
 def draw(image, corners, imgpts, xAng, yAng, zAng):
  img = cv2.imread(image)
@@ -93,6 +94,7 @@ def showMyImage(img, scale):
     img_show = img.copy()
     cv2.imshow("Image", resizeImage(img_show,scale))
     cv2.waitKey(0)
+
 @timeToComplete
 def getRecalibError(obj_points,img_points,rvecs,tvecs,mtx,dist):
     mean_error = 0
@@ -135,6 +137,7 @@ def getAngles(rvecs):
     zAng = math.degrees(math.atan2(Rmtx[0][1][0], Rmtx[0][0][0]))
     print(f"xAng = {xAng} type {type(xAng)}, yAng = {yAng} type {type(yAng)}, zAng = {zAng} type {type(zAng)}")
     return xAng, yAng, zAng
+
 @timeToComplete
 def getCorners(image,board_x,board_y):
     img = cv2.imread(image)
@@ -142,12 +145,13 @@ def getCorners(image,board_x,board_y):
     ret, corners = cv2.findChessboardCorners(gray, (board_y, board_x), None)
     print(ret)
     return ret,corners, gray
+
 def main():
 
     # Uncomment this if you want to generate new sets
-    #board_images = glob.glob(board_img_path)
-    #divideImage(board_images)
-    #return
+    # board_images = glob.glob(board_img_path)
+    # divideImage(board_images)
+    # return
 
     try:
         cam_params = np.load(calib_param_path)
@@ -162,7 +166,7 @@ def main():
 
     mtx = cam_params['mtx']
     dist = cam_params['dist']
-    mtx = np.array([[3.432e+03, 0, 1.62588e+03], [0, 3.456e+03, 2.20795e+03], [0, 0, 1]], dtype=np.float64)
+    #mtx = np.array([[3.432e+03, 0, 1.62588e+03], [0, 3.456e+03, 2.20795e+03], [0, 0, 1]], dtype=np.float64)
     #dist = np.array([0,0,0,0,0], dtype=np.float64)
     print(f"mtx = {mtx} # "
           f"dist = {dist} # ")
@@ -174,10 +178,11 @@ def main():
     object_points[:, :2] = np.mgrid[0:board_y_detect, 0:board_x_detect].T.reshape(-1, 2)
     #i = 1
 
-    experiment_img = glob.glob(f'Set_1_0/*.jpg')
+    experiment_img = glob.glob(experiment)
     xArr = []
     yArr = []
     zArr = []
+
     for k in range(1,10):
         angle_arr = []
         experiment_img = glob.glob(f'Set_0_{k}/*.jpg')
@@ -270,14 +275,15 @@ points_on_object = []
 points_on_image = []
 
 # file paths for calibration and detection
-calib_img_path = 'Cam_calib_1/*.JPG'
+calib_img_path = 'New_Calib_Images/*.JPG'
 calib_param_path = 'cam_param.npz'
 detect_img_path = 'Dist_detect_5/*.JPG'
 save_path = 'cam_param'
 
 # file paths for experiments
 #experiment = 'Prepared_Images/Set_4/*.jpg'
-experiment = 'Set_0_2/*.jpg'
+#experiment = 'Set_0_2/*.jpg'
+experiment = 'Visual_Set/*.jpg'
 # file paths for experiments
 #board_img_path = '9_boards_90_photos/*.jpg'
 board_img_path = '9_boards_6_photos/*.jpg'

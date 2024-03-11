@@ -127,7 +127,7 @@ for c in cnts:
     box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
     box = np.array(box, dtype="int")
     box = perspective.order_points(box)
-    if cv2.contourArea(box) < 2500 or cv2.contourArea(box) > 40000:
+    if cv2.contourArea(box) < 200 :#or cv2.contourArea(box) > 40000:
         continue
     cX = np.average(box[:, 0])
     cY = np.average(box[:, 1])
@@ -150,7 +150,7 @@ for c in cnts:
             x, y = point.ravel()
             # skip if the point is outside the selected contour
             outside = cv2.pointPolygonTest(box, (int(x), int(y)), True)
-            if outside >= 10:
+            if outside >= 1:
                 dot_box_x.append((x, y))
                 dot_box_y.append((y, x))
                 cv2.circle(image, (x, y), 7, (255, 0, 0), -1)
@@ -341,7 +341,7 @@ writer = open(f"Results/prop list {99}.txt", "w")
 writer.write(f"{str(length_box)}")
 writer.close()
 
-if args["contrast"] == "True":
-    image = cv2.hconcat([image, new_image])
+#if args["contrast"] == "True":
+#    image = cv2.hconcat([image, new_image])
 cv2.imwrite("Results/result.jpg", image)
 cv2.imwrite("Results/result_canny.jpg", edged)

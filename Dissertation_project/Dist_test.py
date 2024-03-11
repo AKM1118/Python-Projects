@@ -129,7 +129,7 @@ for c in cnts:
             continue
         else:
             dot_box_x.append((x, y))
-            cv2.circle(image, (x, y), 3, (255, 0, 0), -1)
+            cv2.circle(image, (x, y), 6, (255, 0, 0), -1)
             #           print(f"point found at: {(x, y)}")
             # print(f"point found: {x,y}")
             i += 1
@@ -146,7 +146,10 @@ for c in cnts:
                 dot_box_x.remove(j)
                 #                print("point above is removed")
                 break
-    cntr_box_x.append(dot_box_x)
+    if len(dot_box_x) < 12:
+        continue
+    else:
+        cntr_box_x.append(dot_box_x)
 
     #    print(cv2.contourArea(c))
     # print("test tuple x variable is:", dot_box_x[0][0])
@@ -209,7 +212,10 @@ for c in cnts_y:
                 dot_box_y.remove(j)
                 print("point above is removed")
                 break
-    cntr_box_y.append(dot_box_y)
+    if len(dot_box_y) < 12:
+        continue
+    else:
+        cntr_box_y.append(dot_box_y)
 print(cntr_box_x)
 if args["distance"] == "True":
     dot_box_x_1 = cntr_box_x[0]
@@ -220,7 +226,7 @@ if args["distance"] == "True":
     dot_box_y_1 = cntr_box_y[0]
     dot_box_y_2 = cntr_box_y[1]
     D_y = dist.euclidean((int(dot_box_y_1[0][0]), int(dot_box_y_1[0][1])), (int(dot_box_y_2[0][0]), int(dot_box_y_2[0][1])))
-    D_y_cm = D_y / 298
+    D_y_cm = D_y / 288
     for i in range(len(cntr_box_x) - 1):
 
         dot_box_x_1 = cntr_box_x[i]
@@ -239,16 +245,16 @@ if args["distance"] == "True":
             orig = image.copy()
             # draw circles corresponding to the current points and
             # connect them with a line
-            cv2.line(orig, (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1])),
-                 (int(dot_box_x_2[j][0]), int(dot_box_x_2[j][1])),
-                 (203, 192, 255), 4)
+            #cv2.line(orig, (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1])),
+            #     (int(dot_box_x_2[j][0]), int(dot_box_x_2[j][1])),
+            #     (203, 192, 255), 4)
         #cv2.line(orig, (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1])),
         #         (int(dot_box_x_2[j][0]), int(dot_box_x_2[j][1])),
         #         (0, 0, 255), 2)
 
             cv2.line(orig, (int(dot_box_y_1[j][1]), int(dot_box_y_1[j][0])),
                  (int(dot_box_y_2[j][1]), int(dot_box_y_2[j][0])),
-                 (130, 130, 130), 4)
+                 (255, 165, 0), 4)
         #cv2.line(orig, (int(dot_box_y_1[j][1]), int(dot_box_y_1[j][0])),
         #         (int(dot_box_y_2[j][1]), int(dot_box_y_2[j][0])),
         #         (255, 0, 0), 2)
@@ -265,8 +271,8 @@ if args["distance"] == "True":
             prop_list_x.append(D)
             prop_list_deg_x.append(D_deg)
 
-            cv2.putText(orig, "{:.4f}cm".format(D), (int(dot_box_x_1[j][0]), int(dot_box_x_2[j][1] + 10)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 3, (203, 192, 255), 10)
+            #cv2.putText(orig, "{:.4f}cm".format(D), (int(dot_box_x_1[j][0]), int(dot_box_x_2[j][1] + 10)),
+            #        cv2.FONT_HERSHEY_SIMPLEX, 3, (203, 192, 255), 10)
         #cv2.putText(orig, "{:.4f}deg".format(D_deg), (int(dot_box_x_1[j][0]), int(dot_box_x_1[j][1] + 30)),
         #            cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 10)
 
@@ -279,8 +285,8 @@ if args["distance"] == "True":
             prop_list_y.append(D)
             prop_list_deg_y.append(D_deg)
 
-            cv2.putText(orig, "{:.4f}cm".format(D), (int(dot_box_y_2[j][1]), int(dot_box_y_1[j][0])),
-                    cv2.FONT_HERSHEY_SIMPLEX, 3, (130, 130, 130), 10)
+            cv2.putText(orig, "{:.4f}cm".format(D), (int((dot_box_y_1[j][0]+dot_box_y_2[j][0])*0.5), int((dot_box_y_1[j][0]+dot_box_y_2[j][0])*0.5)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 156, 0), 10)
         # cv2.putText(orig, "{:.4f}deg".format(D_deg), (int(dot_box_y_1[j][1]), int(dot_box_y_1[j][0] + 30)),
         #            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 10)
         # show the output image

@@ -166,7 +166,7 @@ def main():
 
     mtx = cam_params['mtx']
     dist = cam_params['dist']
-    mtx = np.array([[3.432e+03, 0, 1.62588e+03], [0, 3.456e+03, 2.20795e+03], [0, 0, 1]], dtype=np.float64)
+    #mtx = np.array([[3.432e+03, 0, 1.62588e+03], [0, 3.456e+03, 2.20795e+03], [0, 0, 1]], dtype=np.float64)
     #dist = np.array([0,0,0,0,0], dtype=np.float64)
     print(f"mtx = {mtx} # "
           f"dist = {dist} # ")
@@ -190,6 +190,7 @@ def main():
     for frame in experiment_img:
         ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
         img = cv2.imread(frame)
+        print(ret)
         if ret == True:
             corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
 
@@ -275,15 +276,15 @@ points_on_object = []
 points_on_image = []
 
 # file paths for calibration and detection
-calib_img_path = 'New_Calib_Images/*.JPG'
-calib_param_path = 'cam_param_new.npz'
+calib_img_path = 'New_calibphotos_3/*.jpg'
+calib_param_path = 'cam_param_3_m.npz'
 detect_img_path = 'Dist_detect_5/*.JPG'
-save_path = 'cam_param'
+save_path = 'cam_param_3_m'
 
 # file paths for experiments
 #experiment = 'Prepared_Images/Set_4/*.jpg'
-#experiment = 'Set_0_2/*.jpg'
-experiment = 'Visual_Set/*.jpg'
+experiment = 'Set_0_5/*.jpg'
+#experiment = 'New_calibphotos_3/*.jpg'
 # file paths for experiments
 #board_img_path = '9_boards_90_photos/*.jpg'
 board_img_path = '9_boards_6_photos/*.jpg'

@@ -13,7 +13,7 @@ sigma_z_0 = [fitdist(experimentresults10.zAngle,'Normal').sigma fitdist(experime
 
 figure;
 t_x = tiledlayout(3,3);
-title(t_x,'xAngle 0 degrees opt matrix')
+title(t_x,'xAngle 0 degrees 3m matrix')
 nexttile;
 histfit(experimentresults10.xAngle);
 nexttile;
@@ -37,7 +37,7 @@ histfit(experimentresults90.xAngle);
 
 figure
 t_y = tiledlayout(3,3);
-title(t_y,'yAngle 0 degrees opt matrix')
+title(t_y,'yAngle 0 degrees 3m matrix')
 nexttile;
 histfit(experimentresults10.yAngle);
 nexttile;
@@ -60,7 +60,7 @@ histfit(experimentresults90.yAngle);
 
 figure
 t_z = tiledlayout(3,3);
-title(t_z,'zAngle 0 degrees opt matrix')
+title(t_z,'zAngle 0 degrees 3m matrix')
 nexttile;
 histfit(experimentresults10.zAngle);
 nexttile;
@@ -95,7 +95,7 @@ sigma_z_5 = [fitdist(experimentresults15.zAngle,'Normal').sigma fitdist(experime
 
 figure;
 t_x = tiledlayout(3,3);
-title(t_x,'xAngle 5 degrees opt matrix')
+title(t_x,'xAngle 5 degrees 3m matrix')
 nexttile;
 histfit(experimentresults15.xAngle);
 nexttile;
@@ -119,7 +119,7 @@ histfit(experimentresults95.xAngle);
 
 figure
 t_y = tiledlayout(3,3);
-title(t_y,'yAngle 5 degrees opt matrix')
+title(t_y,'yAngle 5 degrees 3m matrix')
 nexttile;
 histfit(experimentresults15.yAngle);
 nexttile;
@@ -142,7 +142,7 @@ histfit(experimentresults95.yAngle);
 
 figure
 t_z = tiledlayout(3,3);
-title(t_z,'zAngle 5 degrees opt matrix')
+title(t_z,'zAngle 5 degrees 3m matrix')
 nexttile;
 histfit(experimentresults15.zAngle);
 nexttile;
@@ -177,7 +177,7 @@ sigma_z_15 = [fitdist(experimentresults115.zAngle,'Normal').sigma fitdist(experi
 
 figure;
 t_x = tiledlayout(3,3);
-title(t_x,'xAngle 15 degrees opt matrix')
+title(t_x,'xAngle 15 degrees 3m matrix')
 nexttile;
 histfit(experimentresults115.xAngle);
 nexttile;
@@ -201,7 +201,7 @@ histfit(experimentresults915.xAngle);
 
 figure
 t_y = tiledlayout(3,3);
-title(t_y,'yAngle 15 degrees opt matrix')
+title(t_y,'yAngle 15 degrees 3m matrix')
 nexttile;
 histfit(experimentresults115.yAngle);
 nexttile;
@@ -224,7 +224,7 @@ histfit(experimentresults915.yAngle);
 
 figure
 t_z = tiledlayout(3,3);
-title(t_z,'zAngle 15 degrees opt matrix')
+title(t_z,'zAngle 15 degrees 3m matrix')
 nexttile;
 histfit(experimentresults115.zAngle);
 nexttile;

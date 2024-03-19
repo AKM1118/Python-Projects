@@ -23,7 +23,7 @@ def WriteToExcel(sheetName, angle_list, set_number):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save(f"experiment results 0 calib {set_number} 6.xls")
+    workbook.save(f"experiment results 1m calib {set_number} 0.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -40,12 +40,12 @@ def divideImage(images):
     cur_board = 0
     cur_image = 1
     # coordinates table for excess board removal
-    coord_dict_p1 = {0 : (1188-50,875+10), 1 : (1531-50, 878+10), 2 : (1866-20, 883+10),
-                    3 : (1193-50, 1114+30), 4 : (1530-50, 1117+30), 5 : (1866-20, 1119+30),
-                    6 : (1193-50, 1354+70), 7 : (1529-50, 1352+70), 8 : (1865-20, 1354+70)}
-    coord_dict_p2 = {0: (1463-50, 1078+10), 1: (1804-50, 1080+10), 2: (2135-20, 1082+10),
-                    3: (1467-50, 1317+30), 4: (1801-50, 1318+30), 5: (2134-20, 1318+30),
-                    6: (1466-50, 1556+70), 7: (1802-50, 1555+70), 8: (2134-20, 1554+70)}
+    coord_dict_p1 = {0 : (1188-50,875+10), 1 : (1531-10, 878+0), 2 : (1866-20, 883+10),
+                    3 : (1193-30, 1114+10), 4 : (1530-10, 1117+10), 5 : (1866-20, 1119+10),
+                    6 : (1193-30, 1354+30), 7 : (1529-10, 1352+30), 8 : (1865-20, 1354+30)}
+    coord_dict_p2 = {0: (1463-50, 1078+10), 1: (1804-10, 1080+0), 2: (2135-20, 1082+10),
+                    3: (1467-30, 1317+10), 4: (1801-10, 1318+10), 5: (2134-20, 1318+10),
+                    6: (1466-30, 1556+30), 7: (1802-10, 1555+30), 8: (2134-20, 1554+30)}
     for frame in images:
         orig = cv2.imread(frame)
         for cur_board in range(9):
@@ -58,7 +58,7 @@ def divideImage(images):
                 result = cv2.rectangle(result,p1,p2,(125,125,125),thickness=-1)
                 #showMyImage(result, 30)
 
-            cv2.imwrite(f"Prepared_Images_3/Image_{cur_board}_{cur_image}.jpg", result)
+            cv2.imwrite(f"Prepared_Images_5/Image_{cur_board}_{cur_image}.jpg", result)
         print(f"Image {cur_image} is done")
         cur_board = 0
         cur_image += 1
@@ -149,6 +149,7 @@ def getCorners(image,board_x,board_y):
 def main():
 
     # Uncomment this if you want to generate new sets
+    #print(glob.glob(board_img_path))
     #board_images = glob.glob(board_img_path)
     #divideImage(board_images)
     #return
@@ -183,27 +184,27 @@ def main():
     yArr = []
     zArr = []
 
-    #for k in range(1,10):
-    angle_arr = []
-    #    experiment_img = glob.glob(f'Set_0_{k}/*.jpg')
-    i = 1
-    for frame in experiment_img:
-        ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
-        img = cv2.imread(frame)
-        print(ret)
-        if ret == True:
-            corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+    for k in range(1,10):
+        angle_arr = []
+        experiment_img = glob.glob(f'Set_2_{k}/*.jpg')
+        i = 1
+        for frame in experiment_img:
+            ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
+            img = cv2.imread(frame)
+            print(ret)
+            if ret == True:
+                corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
 
             # Find the rotation and translation vectors.
-            ret, rvecs, tvecs = cv2.solvePnP(object_points, corners2, mtx, dist)
+                ret, rvecs, tvecs = cv2.solvePnP(object_points, corners2, mtx, dist)
 
             # project 3D points to image plane
-            imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
-            xAng, yAng, zAng = getAngles(rvecs)
+                imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
+                xAng, yAng, zAng = getAngles(rvecs)
             #xArr.append(xAng)
             #yArr.append(yAng)
             #zArr.append(zAng)
-            angle_arr.append((xAng, yAng, zAng))
+                angle_arr.append((xAng, yAng, zAng))
             #h, w = img.shape[:2]
             #object_points = np.zeros((6 * 9, 3), np.float32)
             #object_points[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
@@ -212,12 +213,12 @@ def main():
             #undist = cv2.undistort(img, mtx, dist, None, newcameramtx)
             #imgpoints2, _ = cv2.projectPoints(object_points, rvecs, tvecs, mtx, dist)
             #img = draw(undist, corners2, imgpts, xAng, yAng, zAng)
-            img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
-            showMyImage(img, 30)
+            #img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
+            #showMyImage(img, 30)
             print(f"image {i} is done")
             i += 1
-        #print(f"set {k} is done")
-        #WriteToExcel("results",angle_arr,0)
+        print(f"set {k} is done")
+        WriteToExcel("results",angle_arr,k)
 
 
     # for frame in experiment_img:
@@ -276,10 +277,10 @@ points_on_object = []
 points_on_image = []
 
 # file paths for calibration and detection
-calib_img_path = 'New_calibphotos_3/*.jpg'
-calib_param_path = 'cam_param_3_m.npz'
+calib_img_path = 'New_calibphotos_1/*.jpg'
+calib_param_path = 'cam_param_1_m.npz'
 detect_img_path = 'Dist_detect_5/*.JPG'
-save_path = 'cam_param_3_m'
+save_path = 'cam_param_1_m'
 
 # file paths for experiments
 #experiment = 'Prepared_Images/Set_4/*.jpg'
@@ -287,7 +288,7 @@ experiment = 'Set_0_5/*.jpg'
 #experiment = 'New_calibphotos_3/*.jpg'
 # file paths for experiments
 #board_img_path = '9_boards_90_photos/*.jpg'
-board_img_path = '9_boards_6_photos/*.jpg'
+board_img_path = '9_boards_100_photos_15/*.jpg'
 # excel base for writing
 
 

@@ -23,7 +23,7 @@ def WriteToExcel(sheetName, angle_list, set_number):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save(f"experiment results 1m calib {set_number} 0.xls")
+    workbook.save(f"experiment results 1m calib {set_number} 15 new red.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -186,7 +186,7 @@ def main():
 
     for k in range(1,10):
         angle_arr = []
-        experiment_img = glob.glob(f'Set_2_{k}/*.jpg')
+        experiment_img = glob.glob(f'Set_1_{k}/*.jpg')
         i = 1
         for frame in experiment_img:
             ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)
@@ -278,7 +278,7 @@ points_on_image = []
 
 # file paths for calibration and detection
 calib_img_path = 'New_calibphotos_1/*.jpg'
-calib_param_path = 'cam_param_1_m.npz'
+calib_param_path = 'Matlab_1m_reduced.npz'
 detect_img_path = 'Dist_detect_5/*.JPG'
 save_path = 'cam_param_1_m'
 

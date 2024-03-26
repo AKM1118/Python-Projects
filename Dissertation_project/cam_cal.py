@@ -23,7 +23,7 @@ def WriteToExcel(sheetName, angle_list, set_number):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save(f"experiment results 3m calib {set_number} 15 new red.xls")
+    workbook.save(f"experiment results 3m calib {set_number} 0 new red.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -187,7 +187,7 @@ def main():
 
     for k in range(1,10):
         angle_arr = []
-        experiment_img = glob.glob(f'Set_1_{k}/*.jpg')
+        experiment_img = glob.glob(f'Set_2_{k}/*.jpg')
         i = 1
         for frame in experiment_img:
             ret, corners, gray = getCorners(frame, board_x_detect, board_y_detect)

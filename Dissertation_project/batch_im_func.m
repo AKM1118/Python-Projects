@@ -30,8 +30,8 @@ yAng = deg(3);
 deg_val = [xAng yAng zAng];
 result.im_points = im;
 result.deg_val = deg_val;
-result.zAng = zAng;
-result.yAng = yAng;
-result.xAng = xAng;
+result.zAngle = zAng;
+result.yAngle = yAng;
+result.xAngle = xAng;
 end
 

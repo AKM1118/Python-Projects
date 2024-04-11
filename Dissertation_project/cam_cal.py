@@ -23,7 +23,7 @@ def WriteToExcel(sheetName, angle_list, set_number):
         sheet1.write(i+1, 0, x)
         sheet1.write(i+1, 1, y)
         sheet1.write(i+1, 2, z)
-    workbook.save(f"experiment results 1m calib center {set_number} 15.xls")
+    workbook.save(f"experiment results 1m calib matlab center {set_number} 5.xls")
 
 def timeToComplete(func):
     @wraps(func)
@@ -202,7 +202,10 @@ def main():
 
             # project 3D points to image plane
                 imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
+                print(imgpts)
                 xAng, yAng, zAng = getAngles(rvecs)
+
+                print(f"xAng = {xAng} type {type(xAng)}, yAng = {yAng} type {type(yAng)}, zAng = {zAng} type {type(zAng)}")
             #xArr.append(xAng)
             #yArr.append(yAng)
             #zArr.append(zAng)
@@ -215,8 +218,11 @@ def main():
             #undist = cv2.undistort(img, mtx, dist, None, newcameramtx)
             #imgpoints2, _ = cv2.projectPoints(object_points, rvecs, tvecs, mtx, dist)
             #img = draw(undist, corners2, imgpts, xAng, yAng, zAng)
-            #img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
-            #showMyImage(img, 30)
+                img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
+                showMyImage(img, 30)
+                xAng, yAng, zAng = [19.8819640727402, 3.94318758838466,  -178.849226778572]
+                img = draw(frame, corners2, imgpts, xAng, yAng, zAng)
+                showMyImage(img, 30)
             print(f"image {i} is done")
             i += 1
         print(f"set {k} is done")
@@ -280,7 +286,7 @@ points_on_image = []
 
 # file paths for calibration and detection
 calib_img_path = 'New_calibphotos_1/*.jpg'
-calib_param_path = 'cam_param_center_1m.npz'
+calib_param_path = 'cam_param_center_1m_matlab.npz'
 detect_img_path = 'Dist_detect_5/*.JPG'
 save_path = 'cam_param_center_1m'
 

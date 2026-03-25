@@ -1,7 +1,7 @@
 function result = angle_deg(varargin)
 
 im = varargin{1};
-cameraParams = evalin("base","cameraParams");
+cameraParams = evalin("base","params");
 if nargin == 2
     % Obtain information about the input image source
     info = varargin{2};

@@ -36,25 +36,25 @@ title('fx on normal Matrix')
 grid on
 xlabel('fx')
 ylabel('degrees')
-legend('0 degrees','15 degrees','5 degrees')
+legend('0 degrees','5 degrees','15 degrees')
 nexttile;
 plot(paramexperimentfy20.param20,paramexperimentfy20.xAngle,paramexperimentfy20.param20,paramexperimentfy21.xAngle,paramexperimentfy20.param20,paramexperimentfy22.xAngle);
 title('fy on normal Matrix')
 grid on
 xlabel('fy')
 ylabel('degrees')
-legend('0 degrees','15 degrees','5 degrees')
+legend('0 degrees','5 degrees','15 degrees')
 nexttile;
 plot(paramexperimentcx20.param20,paramexperimentcx20.xAngle,paramexperimentcx20.param20,paramexperimentcx21.xAngle,paramexperimentcx20.param20,paramexperimentcx22.xAngle);
 title('cx on normal Matrix')
 grid on
 xlabel('cx')
 ylabel('degrees')
-legend('0 degrees','15 degrees','5 degrees')
+legend('0 degrees','5 degrees','15 degrees')
 nexttile;
 plot(paramexperimentcy20.param20,paramexperimentcy20.xAngle,paramexperimentcy20.param20,paramexperimentcy21.xAngle,paramexperimentcy20.param20,paramexperimentcy22.xAngle);
 title('cy on normal Matrix')
 grid on
 xlabel('cy')
 ylabel('degrees')
-legend('0 degrees','15 degrees','5 degrees')
+legend('0 degrees','5 degrees','15 degrees')

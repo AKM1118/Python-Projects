@@ -36,7 +36,7 @@ def getParamArray(param,steps):
     return param_array
 
 
-calib_param_path = 'cam_param_mega_matlab.npz'
+calib_param_path = 'cam_param_opt_matlab.npz'
 cam_params = np.load(calib_param_path)
 mtx = cam_params['mtx']
 dist = cam_params['dist']
@@ -50,9 +50,9 @@ def getResults(param_list,experiment_number):
     for param in param_list:
         i = param_list.index(param)
         cam_params = np.load(calib_param_path)
-        #mtx = np.array([[3.332671e+03, 0, 1.60978633e+03], [0, 3.45279984e+03, 1.21315992e+03], [0, 0, 1]],
-        #               dtype=np.float64)
-        mtx = cam_params['mtx']
+        mtx = np.array([[3.600e+03, 0, 1.637286669854761e+03], [0, 3.650e+03, 1.200332283218913e+03], [0, 0, 1]],
+                       dtype=np.float64)
+        #mtx = cam_params['mtx']
         #mtx = np.array([[3.332671e+03, 0, 1], [0, 1, 1], [0, 0, 1]], dtype=np.float64)
         #mtx = np.array([[1, 0, 1], [0, 1, 1], [0, 0, 1]], dtype=np.float64)
         #mtx = cam_params['mtx']
@@ -108,7 +108,7 @@ ret, corners, gray = cam_cal.getCorners(test_image, board_x_detect, board_y_dete
 img = cv2.imread(test_image)
 corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
 
-getResults(param_list, 32)
+getResults(param_list, 22)
 
 
 

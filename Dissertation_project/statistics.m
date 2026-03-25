@@ -331,69 +331,266 @@
 % nexttile;
 % histfit(experimentresults9.zAngle);
 
-mean_x_0 = mean(deg_0.xAngle);
-mean_y_0 = mean(deg_0.yAngle);
-mean_z_0 = mean(deg_0.zAngle);
+mean_x_0 = [[mean(deg0_1.xAngle) mean(deg0_2.xAngle) mean(deg0_3.xAngle)] [mean(deg0_4.xAngle) mean(deg0_5.xAngle) mean(deg0_6.xAngle)] [mean(deg0_7.xAngle) mean(deg0_8.xAngle)  mean(deg0_9.xAngle)]];
 
-var_x_0 = var(deg_0.xAngle);
-var_y_0 = var(deg_0.yAngle);
-var_z_0 = var(deg_0.zAngle);
+var_x_0 = [[var(deg0_1.xAngle) var(deg0_2.xAngle) var(deg0_3.xAngle)] [var(deg0_4.xAngle) var(deg0_5.xAngle) var(deg0_6.xAngle)] [var(deg0_7.xAngle) var(deg0_8.xAngle) var(deg0_9.xAngle)]];
 
-sigma_x_0 = fitdist(deg_0.xAngle,'Normal').sigma;
-sigma_y_0 = fitdist(deg_0.yAngle,'Normal').sigma;
-sigma_z_0 = fitdist(deg_0.zAngle,'Normal').sigma;
+sigma_x_0 = [[fitdist(deg0_1.xAngle,'Normal').sigma fitdist(deg0_2.xAngle,'Normal').sigma fitdist(deg0_3.xAngle,'Normal').sigma] [fitdist(deg0_4.xAngle,'Normal').sigma fitdist(deg0_5.xAngle,'Normal').sigma fitdist(deg0_6.xAngle,'Normal').sigma] [fitdist(deg0_7.xAngle,'Normal').sigma fitdist(deg0_8.xAngle,'Normal').sigma fitdist(deg0_9.xAngle,'Normal').sigma]];
 
-mean_x_5 = mean(deg_5.xAngle);
-mean_y_5 = mean(deg_5.yAngle);
-mean_z_5 = mean(deg_5.zAngle);
+mean_x_3 = [[mean(deg3_1.xAngle) mean(deg3_2.xAngle) mean(deg3_3.xAngle)] [mean(deg3_4.xAngle) mean(deg3_5.xAngle) mean(deg3_6.xAngle)] [mean(deg3_7.xAngle) mean(deg3_8.xAngle)  mean(deg3_9.xAngle)]];
 
-var_x_5 = var(deg_5.xAngle);
-var_y_5 = var(deg_5.yAngle);
-var_z_5 = var(deg_5.zAngle);
+var_x_3 = [[var(deg3_1.xAngle) var(deg3_2.xAngle) var(deg3_3.xAngle)] [var(deg3_4.xAngle) var(deg3_5.xAngle) var(deg3_6.xAngle)] [var(deg3_7.xAngle) var(deg3_8.xAngle) var(deg3_9.xAngle)]];
 
-sigma_x_5 = fitdist(deg_5.xAngle,'Normal').sigma;
-sigma_y_5 = fitdist(deg_5.yAngle,'Normal').sigma;
-sigma_z_5 = fitdist(deg_5.zAngle,'Normal').sigma;
+sigma_x_3 = [[fitdist(deg3_1.xAngle,'Normal').sigma fitdist(deg3_2.xAngle,'Normal').sigma fitdist(deg3_3.xAngle,'Normal').sigma] [fitdist(deg3_4.xAngle,'Normal').sigma fitdist(deg3_5.xAngle,'Normal').sigma fitdist(deg3_6.xAngle,'Normal').sigma] [fitdist(deg3_7.xAngle,'Normal').sigma fitdist(deg3_8.xAngle,'Normal').sigma fitdist(deg3_9.xAngle,'Normal').sigma]];
 
-mean_x_15 = mean(deg_15.xAngle);
-mean_y_15 = mean(deg_15.yAngle);
-mean_z_15 = mean(deg_15.zAngle);
+mean_x_5 = [[mean(deg5_1.xAngle) mean(deg5_2.xAngle) mean(deg5_3.xAngle)] [mean(deg5_4.xAngle) mean(deg5_5.xAngle) mean(deg5_6.xAngle)] [mean(deg5_7.xAngle) mean(deg5_8.xAngle)  mean(deg5_9.xAngle)]];
 
-var_x_15 = var(deg_15.xAngle);
-var_y_15 = var(deg_15.yAngle);
-var_z_15 = var(deg_15.zAngle);
+var_x_5 = [[var(deg5_1.xAngle) var(deg5_2.xAngle) var(deg5_3.xAngle)] [var(deg5_4.xAngle) var(deg5_5.xAngle) var(deg5_6.xAngle)] [var(deg5_7.xAngle) var(deg5_8.xAngle) var(deg5_9.xAngle)]];
 
-sigma_x_15 = fitdist(deg_15.xAngle,'Normal').sigma;
-sigma_y_15 = fitdist(deg_15.yAngle,'Normal').sigma;
-sigma_z_15 = fitdist(deg_15.zAngle,'Normal').sigma;
-figure;
-t_x = tiledlayout(1,3);
-title(t_x,'xAngle')
-nexttile;
-histfit(deg_0.xAngle);
-nexttile;
-histfit(deg_5.xAngle);
-nexttile;
-histfit(deg_15.xAngle);
+sigma_x_5 = [[fitdist(deg5_1.xAngle,'Normal').sigma fitdist(deg5_2.xAngle,'Normal').sigma fitdist(deg5_3.xAngle,'Normal').sigma] [fitdist(deg5_4.xAngle,'Normal').sigma fitdist(deg5_5.xAngle,'Normal').sigma fitdist(deg5_6.xAngle,'Normal').sigma] [fitdist(deg5_7.xAngle,'Normal').sigma fitdist(deg5_8.xAngle,'Normal').sigma fitdist(deg5_9.xAngle,'Normal').sigma]];
+
+mean_x_7 = [[mean(deg7_1.xAngle) mean(deg7_2.xAngle) mean(deg7_3.xAngle)] [mean(deg7_4.xAngle) mean(deg7_5.xAngle) mean(deg7_6.xAngle)] [mean(deg7_7.xAngle) mean(deg7_8.xAngle)  mean(deg7_9.xAngle)]];
+
+var_x_7 = [[var(deg7_1.xAngle) var(deg7_2.xAngle) var(deg7_3.xAngle)] [var(deg7_4.xAngle) var(deg7_5.xAngle) var(deg7_6.xAngle)] [var(deg7_7.xAngle) var(deg7_8.xAngle) var(deg7_9.xAngle)]];
+
+sigma_x_7 = [[fitdist(deg7_1.xAngle,'Normal').sigma fitdist(deg7_2.xAngle,'Normal').sigma fitdist(deg7_3.xAngle,'Normal').sigma] [fitdist(deg7_4.xAngle,'Normal').sigma fitdist(deg7_5.xAngle,'Normal').sigma fitdist(deg7_6.xAngle,'Normal').sigma] [fitdist(deg7_7.xAngle,'Normal').sigma fitdist(deg7_8.xAngle,'Normal').sigma fitdist(deg7_9.xAngle,'Normal').sigma]];
+
+mean_x_10 = [[mean(deg10_1.xAngle) mean(deg10_2.xAngle) mean(deg10_3.xAngle)] [mean(deg10_4.xAngle) mean(deg10_5.xAngle) mean(deg10_6.xAngle)] [mean(deg10_7.xAngle) mean(deg10_8.xAngle)  mean(deg10_9.xAngle)]];
+
+var_x_10 = [[var(deg10_1.xAngle) var(deg10_2.xAngle) var(deg10_3.xAngle)] [var(deg10_4.xAngle) var(deg10_5.xAngle) var(deg10_6.xAngle)] [var(deg10_7.xAngle) var(deg10_8.xAngle) var(deg10_9.xAngle)]];
+
+sigma_x_10 = [[fitdist(deg10_1.xAngle,'Normal').sigma fitdist(deg10_2.xAngle,'Normal').sigma fitdist(deg10_3.xAngle,'Normal').sigma] [fitdist(deg10_4.xAngle,'Normal').sigma fitdist(deg10_5.xAngle,'Normal').sigma fitdist(deg10_6.xAngle,'Normal').sigma] [fitdist(deg10_7.xAngle,'Normal').sigma fitdist(deg10_8.xAngle,'Normal').sigma fitdist(deg10_9.xAngle,'Normal').sigma]];
+
+mean_x_12 = [[mean(deg12_1.xAngle) mean(deg12_2.xAngle) mean(deg12_3.xAngle)] [mean(deg12_4.xAngle) mean(deg12_5.xAngle) mean(deg12_6.xAngle)] [mean(deg12_7.xAngle) mean(deg12_8.xAngle)  mean(deg12_9.xAngle)]];
+
+var_x_12 = [[var(deg12_1.xAngle) var(deg12_2.xAngle) var(deg12_3.xAngle)] [var(deg12_4.xAngle) var(deg12_5.xAngle) var(deg12_6.xAngle)] [var(deg12_7.xAngle) var(deg12_8.xAngle) var(deg12_9.xAngle)]];
+
+sigma_x_12 = [[fitdist(deg12_1.xAngle,'Normal').sigma fitdist(deg12_2.xAngle,'Normal').sigma fitdist(deg12_3.xAngle,'Normal').sigma] [fitdist(deg12_4.xAngle,'Normal').sigma fitdist(deg12_5.xAngle,'Normal').sigma fitdist(deg12_6.xAngle,'Normal').sigma] [fitdist(deg12_7.xAngle,'Normal').sigma fitdist(deg12_8.xAngle,'Normal').sigma fitdist(deg12_9.xAngle,'Normal').sigma]];
+
+mean_x_15 = [[mean(deg15_1.xAngle) mean(deg15_2.xAngle) mean(deg15_3.xAngle)] [mean(deg15_4.xAngle) mean(deg15_5.xAngle) mean(deg15_6.xAngle)] [mean(deg15_7.xAngle) mean(deg15_8.xAngle)  mean(deg15_9.xAngle)]];
+
+var_x_15 = [[var(deg15_1.xAngle) var(deg15_2.xAngle) var(deg15_3.xAngle)] [var(deg15_4.xAngle) var(deg15_5.xAngle) var(deg15_6.xAngle)] [var(deg15_7.xAngle) var(deg15_8.xAngle) var(deg15_9.xAngle)]];
+
+sigma_x_15 = [[fitdist(deg15_1.xAngle,'Normal').sigma fitdist(deg15_2.xAngle,'Normal').sigma fitdist(deg15_3.xAngle,'Normal').sigma] [fitdist(deg15_4.xAngle,'Normal').sigma fitdist(deg15_5.xAngle,'Normal').sigma fitdist(deg15_6.xAngle,'Normal').sigma] [fitdist(deg15_7.xAngle,'Normal').sigma fitdist(deg15_8.xAngle,'Normal').sigma fitdist(deg15_9.xAngle,'Normal').sigma]];
 
 
 figure;
-t_y = tiledlayout(1,3);
-title(t_y,'yAngle')
+t_x0 = tiledlayout(3,3);
+title(t_x0,'xAngle 0')
 nexttile;
-histfit(deg_0.yAngle);
+histfit(deg0_1.xAngle);
 nexttile;
-histfit(deg_5.yAngle);
+histfit(deg0_2.xAngle);
 nexttile;
-histfit(deg_15.yAngle);
-
+histfit(deg0_3.xAngle);
+nexttile;
+histfit(deg0_4.xAngle);
+nexttile;
+histfit(deg0_5.xAngle);
+nexttile;
+histfit(deg0_6.xAngle);
+nexttile;
+histfit(deg0_7.xAngle);
+nexttile;
+histfit(deg0_8.xAngle);
+nexttile;
+histfit(deg0_9.xAngle);
 
 figure;
-t_z = tiledlayout(1,3);
-title(t_z,'zAngle')
+t_x3 = tiledlayout(3,3);
+title(t_x3,'xAngle 3')
 nexttile;
-histfit(deg_0.zAngle);
+histfit(deg3_1.xAngle);
 nexttile;
-histfit(deg_5.zAngle);
+histfit(deg3_2.xAngle);
 nexttile;
-histfit(deg_15.zAngle);
+histfit(deg3_3.xAngle);
+nexttile;
+histfit(deg3_4.xAngle);
+nexttile;
+histfit(deg3_5.xAngle);
+nexttile;
+histfit(deg3_6.xAngle);
+nexttile;
+histfit(deg3_7.xAngle);
+nexttile;
+histfit(deg3_8.xAngle);
+nexttile;
+histfit(deg3_9.xAngle);
+
+figure;
+t_x5 = tiledlayout(3,3);
+title(t_x5,'xAngle 5')
+nexttile;
+histfit(deg5_1.xAngle);
+nexttile;
+histfit(deg5_2.xAngle);
+nexttile;
+histfit(deg5_3.xAngle);
+nexttile;
+histfit(deg5_4.xAngle);
+nexttile;
+histfit(deg5_5.xAngle);
+nexttile;
+histfit(deg5_6.xAngle);
+nexttile;
+histfit(deg5_7.xAngle);
+nexttile;
+histfit(deg5_8.xAngle);
+nexttile;
+histfit(deg5_9.xAngle);
+
+figure;
+t_x7 = tiledlayout(3,3);
+title(t_x7,'xAngle 7')
+nexttile;
+histfit(deg7_1.xAngle);
+nexttile;
+histfit(deg7_2.xAngle);
+nexttile;
+histfit(deg7_3.xAngle);
+nexttile;
+histfit(deg7_4.xAngle);
+nexttile;
+histfit(deg7_5.xAngle);
+nexttile;
+histfit(deg7_6.xAngle);
+nexttile;
+histfit(deg7_7.xAngle);
+nexttile;
+histfit(deg7_8.xAngle);
+nexttile;
+histfit(deg7_9.xAngle);
+
+figure;
+t_x10 = tiledlayout(3,3);
+title(t_x10,'xAngle 10')
+nexttile;
+histfit(deg10_1.xAngle);
+nexttile;
+histfit(deg10_2.xAngle);
+nexttile;
+histfit(deg10_3.xAngle);
+nexttile;
+histfit(deg10_4.xAngle);
+nexttile;
+histfit(deg10_5.xAngle);
+nexttile;
+histfit(deg10_6.xAngle);
+nexttile;
+histfit(deg10_7.xAngle);
+nexttile;
+histfit(deg10_8.xAngle);
+nexttile;
+histfit(deg10_9.xAngle);
+
+figure;
+t_x12 = tiledlayout(3,3);
+title(t_x12,'xAngle 12')
+nexttile;
+histfit(deg12_1.xAngle);
+nexttile;
+histfit(deg12_2.xAngle);
+nexttile;
+histfit(deg12_3.xAngle);
+nexttile;
+histfit(deg12_4.xAngle);
+nexttile;
+histfit(deg12_5.xAngle);
+nexttile;
+histfit(deg12_6.xAngle);
+nexttile;
+histfit(deg12_7.xAngle);
+nexttile;
+histfit(deg12_8.xAngle);
+nexttile;
+histfit(deg12_9.xAngle);
+
+figure;
+t_x15 = tiledlayout(3,3);
+title(t_x15,'xAngle 15')
+nexttile;
+histfit(deg15_1.xAngle);
+nexttile;
+histfit(deg15_2.xAngle);
+nexttile;
+histfit(deg15_3.xAngle);
+nexttile;
+histfit(deg15_4.xAngle);
+nexttile;
+histfit(deg15_5.xAngle);
+nexttile;
+histfit(deg15_6.xAngle);
+nexttile;
+histfit(deg15_7.xAngle);
+nexttile;
+histfit(deg15_8.xAngle);
+nexttile;
+histfit(deg15_9.xAngle);
+% 
+% mean_x_0 = mean(deg_0.xAngle);
+% mean_y_0 = mean(deg_0.yAngle);
+% mean_z_0 = mean(deg_0.zAngle);
+% 
+% var_x_0 = var(deg_0.xAngle);
+% var_y_0 = var(deg_0.yAngle);
+% var_z_0 = var(deg_0.zAngle);
+% 
+% sigma_x_0 = fitdist(deg_0.xAngle,'Normal').sigma;
+% sigma_y_0 = fitdist(deg_0.yAngle,'Normal').sigma;
+% sigma_z_0 = fitdist(deg_0.zAngle,'Normal').sigma;
+% 
+% mean_x_5 = mean(deg_5.xAngle);
+% mean_y_5 = mean(deg_5.yAngle);
+% mean_z_5 = mean(deg_5.zAngle);
+% 
+% var_x_5 = var(deg_5.xAngle);
+% var_y_5 = var(deg_5.yAngle);
+% var_z_5 = var(deg_5.zAngle);
+% 
+% sigma_x_5 = fitdist(deg_5.xAngle,'Normal').sigma;
+% sigma_y_5 = fitdist(deg_5.yAngle,'Normal').sigma;
+% sigma_z_5 = fitdist(deg_5.zAngle,'Normal').sigma;
+% 
+% mean_x_15 = mean(deg_15.xAngle);
+% mean_y_15 = mean(deg_15.yAngle);
+% mean_z_15 = mean(deg_15.zAngle);
+% 
+% var_x_15 = var(deg_15.xAngle);
+% var_y_15 = var(deg_15.yAngle);
+% var_z_15 = var(deg_15.zAngle);
+% 
+% sigma_x_15 = fitdist(deg_15.xAngle,'Normal').sigma;
+% sigma_y_15 = fitdist(deg_15.yAngle,'Normal').sigma;
+% sigma_z_15 = fitdist(deg_15.zAngle,'Normal').sigma;
+% figure;
+% t_x = tiledlayout(1,3);
+% title(t_x,'xAngle')
+% nexttile;
+% histfit(deg_0.xAngle);
+% nexttile;
+% histfit(deg_5.xAngle);
+% nexttile;
+% histfit(deg_15.xAngle);
+% 
+% 
+% figure;
+% t_y = tiledlayout(1,3);
+% title(t_y,'yAngle')
+% nexttile;
+% histfit(deg_0.yAngle);
+% nexttile;
+% histfit(deg_5.yAngle);
+% nexttile;
+% histfit(deg_15.yAngle);
+% 
+% 
+% figure;
+% t_z = tiledlayout(1,3);
+% title(t_z,'zAngle')
+% nexttile;
+% histfit(deg_0.zAngle);
+% nexttile;
+% histfit(deg_5.zAngle);
+% nexttile;
+% histfit(deg_15.zAngle);
